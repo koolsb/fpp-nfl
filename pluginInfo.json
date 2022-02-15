@@ -1,0 +1,23 @@
+{
+	"repoName": "fpp-nfl",
+	"name": "NFL Touchdown Plugin",
+	"author": "Ben Kools (koolsb)",
+	"description": "Automatically play a celebratory sequence when your NFL team scores!",
+	"homeURL": "https://github.com/koolsb/fpp-nfl",
+	"srcURL": "https://github.com/koolsb/fpp-nfl.git",
+	"bugURL": "https://github.com/koolsb/fpp-nfl/issues",
+	"allowUpdates": 1,
+	"versions": [
+		{
+			"minFPPVersion": "5.0",
+			"maxFPPVersion": "0",
+			"branch": "main",
+			"sha": "",
+			"dependencies": {
+			    "plugins": [],
+			    "packages": [],
+				"scripts": []
+			}
+		}
+	]
+}
