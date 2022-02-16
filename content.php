@@ -25,50 +25,19 @@ foreach ($pluginSettings as $key => $value) {
 if (isset($_POST['updateTeamID'])) { 
   $teamID = trim($_POST['teamID']);
   WriteSettingToFile("teamID",$teamID,$pluginName);
-  WriteSettingToFile("nfl_enabled",urlencode("false"),$pluginName);
-  WriteSettingToFile("nfl_restarting",urlencode("true"),$pluginName);
   echo "<script type=\"text/javascript\">$.jGrowl('NFL Team Updated',{themeState:'success'});</script>";
 }
 
 if (isset($_POST['updateTouchdownSequence'])) { 
   $touchdownSequence = trim($_POST['touchdownSequence']);
   WriteSettingToFile("touchdownSequence",$touchdownSequence,$pluginName);
-  WriteSettingToFile("nfl_enabled",urlencode("false"),$pluginName);
-  WriteSettingToFile("nfl_restarting",urlencode("true"),$pluginName);
   echo "<script type=\"text/javascript\">$.jGrowl('Touchdown Sequence Updated',{themeState:'success'});</script>";
 }
 
 if (isset($_POST['updateWinSequence'])) { 
   $winSequence = trim($_POST['winSequence']);
   WriteSettingToFile("winSequence",$winSequence,$pluginName);
-  WriteSettingToFile("nfl_enabled",urlencode("false"),$pluginName);
-  WriteSettingToFile("nfl_restarting",urlencode("true"),$pluginName);
   echo "<script type=\"text/javascript\">$.jGrowl('NFL Team Updated',{themeState:'success'});</script>";
-}
-
-
-
-$sequenceDirectory= $settings['sequenceDirectory'];
-$touchdownOptions = "";
-$winOptions = "";
-if(is_dir($sequenceDirectory)) {
-  if ($dirTemp = opendir($sequenceDirectory)){
-    while (($fileRead = readdir($dirTemp)) !== false) {
-      if (($fileRead == ".") || ($fileRead == "..")){
-        continue;
-      }
-      $fileRead = pathinfo($fileRead, PATHINFO_FILENAME);
-      if ($fileRead == $touchdownSequence) {
-        $touchdownOptions .= "<option selected value=\"{$fileRead}\">{$fileRead}</option>";
-      } elseif ($fileRead == $winSequence) {
-        $winOptions .= "<option selected value=\"{$fileRead}\">{$fileRead}</option>";
-      } else {
-        $touchdownOptions .= "<option value=\"{$fileRead}\">{$fileRead}</option>";
-        $winOptions .= "<option value=\"{$fileRead}\">{$fileRead}</option>";
-      }
-    }
-    closedir($dirTemp);
-  }
 }
 
 //get available sequences
@@ -103,9 +72,6 @@ $teams = $result['sports']['0']['leagues']['0']['teams'];
     integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1"
     crossorigin="anonymous">
   <style>
-    a {
-      color: #D65A31;
-    }
     #bodyWrapper {
       background-color: #20222e;
     }
