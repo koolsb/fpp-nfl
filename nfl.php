@@ -6,9 +6,6 @@ $logFile = $settings['logDirectory']."/".$pluginName.".log";
 $pluginConfigFile = $settings['configDirectory'] . "/plugin." .$pluginName;
 $pluginSettings = parse_ini_file($pluginConfigFile);
 
-WriteSettingToFile("nfl_enabled",urlencode("true"),$pluginName);
-WriteSettingToFile("nfl_restarting",urlencode("false"),$pluginName);
-
 echo "Starting NFL Plugin\n";
 logEntry("Starting NFL Plugin");
 
