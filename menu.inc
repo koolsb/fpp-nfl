@@ -13,7 +13,7 @@
 
 $menuEntries = Array(
 	Array(
-		'text' => 'Lights on Cloverleaf',
+		'text' => 'NFL Touchdown',
 		'type' => 'content',
 		'page' => 'content.php',
 		'wrap' => 1
