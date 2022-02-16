@@ -136,7 +136,7 @@ $teams = $result['sports']['0']['leagues']['0']['teams'];
                   } ?>
                 </select>
                 <span class="input-group-btn">
-                  <button id="updateTeamID" name="updateTeamID" class="btn mr-md-3 btn-primary" type="submit">Update</button>
+                  <button id="updateTeamID" name="updateTeamID" class="btn mr-md-3 btn-dark" type="submit">Update</button>
                 </span>
               </div>
             </form>
@@ -167,7 +167,7 @@ $teams = $result['sports']['0']['leagues']['0']['teams'];
                   } ?>
                 </select>
                 <span class="input-group-btn">
-                  <button id="updateTouchdownSequence" name="updateTouchdownSequence" class="btn mr-md-3 btn-primary" type="submit">Update</button>
+                  <button id="updateTouchdownSequence" name="updateTouchdownSequence" class="btn mr-md-3 btn-dark" type="submit">Update</button>
                 </span>
               </div>
             </form>
@@ -198,7 +198,7 @@ $teams = $result['sports']['0']['leagues']['0']['teams'];
                   } ?>
                 </select>
                 <span class="input-group-btn">
-                  <button id="updateWinSequence" name="updateWinSequence" class="btn mr-md-3 btn-primary" type="submit">Update</button>
+                  <button id="updateWinSequence" name="updateWinSequence" class="btn mr-md-3 btn-dark" type="submit">Update</button>
                 </span>
               </div>
             </form>
