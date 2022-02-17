@@ -1,4 +1,5 @@
 <?php
+$skipJSsettings = true;
 include_once "/opt/fpp/www/common.php";
 $pluginName = basename(dirname(__FILE__));
 $pluginPath = $settings['pluginDirectory']."/".$pluginName."/"; 
