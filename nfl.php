@@ -16,7 +16,7 @@ $winSequence = "";
 $teamScore = 0;
 $oppoScore = 0;
 $gameState = 'pre';
-$sleepTime = 600;
+$sleepTime = 5;
 
 
 while(true) {
@@ -39,6 +39,7 @@ while(true) {
     $games = $games['events'];
 
     foreach($games as $game) {
+      echo $game['shortName'];
       if (strpos($game['shortName'], $teamID) !== false) {
         if ($game['competitions'][0]['competitors'][0]['team']['abbreviation'] == $teamID) {
           $teamIndex = 0;
@@ -54,6 +55,7 @@ while(true) {
           if ($touchdownSequence != '') {
             insertPlaylistImmediate($touchdownSequence);
             logEntry("Touchdown! Playing sequence.");
+            echo "Touchdown! Playing sequence.";
           }
         }
         $teamScore = $game['competitions'][0]['competitors'][$teamIndex]['score'];
@@ -77,6 +79,7 @@ while(true) {
               if ($winSequence != '') {
                 insertPlaylistImmediate($winSequence);
                 logEntry("Your team won! Playing sequence.");
+                echo "Your team won! Playing sequence.";
               }
             }
           }
@@ -88,6 +91,7 @@ while(true) {
         break;
       } else {
         logEntry("Team not found this week.");
+        echo "Team not found this week.";
       }
     }      
   }
