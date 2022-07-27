@@ -31,6 +31,9 @@ while(true) {
   $teamID = urldecode($pluginSettings['teamID']);
   $touchdownSequence = urldecode($pluginSettings['touchdownSequence']);
   $winSequence = urldecode($pluginSettings['winSequence']);
+  $myScore = urldecode($pluginSettings['myScore']);
+  $theirScore = urldecode($pluginSettings['theirScore']);
+
 
   if ($teamID != '') {
     //get NFL score

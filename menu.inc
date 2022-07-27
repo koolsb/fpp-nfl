@@ -18,6 +18,12 @@ $menuEntries = Array(
 		'page' => 'content.php',
 		'wrap' => 1
 	),
+	Array(
+		'text' => 'NFL Touchdown',
+		'type' => 'status',
+		'page' => 'status.php',
+		'wrap' => 1
+	),
 );
 
 ##############################################################################
