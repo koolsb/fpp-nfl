@@ -112,13 +112,15 @@ $teams = $result['sports']['0']['leagues']['0']['teams'];
     <div class="container-fluid">
       <div class="card">
         <!-- NFL Team -->
-        <div class="justify-content-md-center row pt-4 pb-5">
+        <div class="justify-content-md-center row pt-4 pb-4">
           <div class="col-md-6">
             <div class="card-title h5">
               NFL Team
             </div>
             <div class="mb-2 text-muted small h6">
-              Select your NFL team
+              Select your NFL team<br><br>
+              The ESPN API is only polled on 10 minute intervals when your team is not<br>playing. 
+              Changing your team may not be reflected until the next polling interval.
             </div>
           </div>
           <div class="col-md-6">
