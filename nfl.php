@@ -16,7 +16,14 @@ $winSequence = "";
 $teamScore = 0;
 $oppoScore = 0;
 $gameState = 'pre';
-$sleepTime = 5;
+$sleepTime = 600;
+
+//game status fields
+$opponentID = "";
+$kickoff = "";
+$gameStatus = "";
+$myScore = "";
+$theirScore = "";
 
 
 while(true) {
@@ -41,12 +48,23 @@ while(true) {
     foreach($games as $game) {
       echo $game['shortName'];
       if (strpos($game['shortName'], $teamID) !== false) {
+
+        // set kickoff time
+        WriteSettingToFile("kickoff",$game['date'],$pluginName);
+
         if ($game['competitions'][0]['competitors'][0]['team']['abbreviation'] == $teamID) {
           $teamIndex = 0;
           $oppoIndex = 1;
+
         } else {
            $teamIndex = 1;
            $oppoIndex = 0;
+        }
+
+        // set opponent ID
+        if ($opponentID != $game['competitions'][0]['competitors'][$oppoIndex]['team']['abbreviation']) {
+          WriteSettingToFile("opponentID",$game['competitions'][0]['competitors'][$oppoIndex]['team']['abbreviation'],$pluginName);
+          WriteSettingToFile("opponentName",$game['competitions'][0]['competitors'][$oppoIndex]['team']['displayName'],$pluginName);
         }
 
         //check score changes
@@ -58,8 +76,23 @@ while(true) {
             echo "Touchdown! Playing sequence.";
           }
         }
+        
+        //update scores
         $teamScore = $game['competitions'][0]['competitors'][$teamIndex]['score'];
         $oppoScore = $game['competitions'][0]['competitors'][$oppoIndex]['score'];
+
+        //update stored scores
+        if ($teamScore != $myScore) {
+          WriteSettingToFile("myScore",$game['competitions'][0]['competitors'][$teamIndex]['score'],$pluginName);
+        }
+        if ($oppoScore != $theirScore) {
+          WriteSettingToFile("theirScore",$game['competitions'][0]['competitors'][$oppoIndex]['score'],$pluginName);
+        }
+
+        //update stored game status
+        if ($gameStatus != $game['status']['type']['state']) {
+          WriteSettingToFile("gameStatus",$game['status']['type']['state'],$pluginName);
+        }
 
         //update sleep timer
         if ($game['status']['type']['state'] == 'pre') {
@@ -92,6 +125,7 @@ while(true) {
       } else {
         logEntry("Team not found this week.");
         echo "Team not found this week.";
+        WriteSettingToFile("kickoff","0",$pluginName);
       }
     }      
   }

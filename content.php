@@ -17,6 +17,15 @@ if (strlen(urldecode($pluginSettings['touchdownSequence']))<1){
 if (strlen(urldecode($pluginSettings['winSequence']))<1){
   WriteSettingToFile("winSequence",urlencode(""),$pluginName);
 }
+if (strlen(urldecode($pluginSettings['kickoff']))<1){
+  WriteSettingToFile("kickoff",urlencode(""),$pluginName);
+}
+if (strlen(urldecode($pluginSettings['myScore']))<1){
+  WriteSettingToFile("myScore",urlencode(""),$pluginName);
+}
+if (strlen(urldecode($pluginSettings['theirScore']))<1){
+  WriteSettingToFile("theirScore",urlencode(""),$pluginName);
+}
 
 foreach ($pluginSettings as $key => $value) { 
   ${$key} = urldecode($value);
@@ -204,6 +213,91 @@ $teams = $result['sports']['0']['leagues']['0']['teams'];
             </form>
           </div>
         </div>
+      </div>
+    </div>
+    <div class="container-fluid">
+      <div class="card">
+        <!-- Status -->
+        <div class="justify-content-md-center row pt-4 pb-5">
+          <div class="col-md-auto">
+            <h3>Game Status</h3>
+          </div>          
+        </div>
+        <div class="justify-content-md-center row">
+          <div class="col-md-2">
+            <div class="card-title h5">
+              Kickoff:
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card-title">
+              <?php if ($kickoff == "0") {
+                echo 'No game scheduled this week';
+              } else {
+                $kickoff = new DateTime($kickoff, new DateTimeZone("UTC"));
+                $kickoff->setTimezone(new DateTimeZone(date_default_timezone_get()));
+                echo $kickoff->format("l, F j @ g:i A");
+                //echo date_format(date_create($kickoff), "l, F j @ g:i A e") . date_default_timezone_get();
+              } ?>
+            </div>
+          </div>
+        </div>
+        <?php if ($kickoff != "0") { ?>
+        <div class="justify-content-md-center row">
+          <div class="col-md-2">
+            <div class="card-title h5">
+              Opponent:
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card-title">
+              <?=$opponentName?>
+            </div>
+          </div>
+        </div>
+        <div class="justify-content-md-center row pt-5">
+          <div class="col-md-2">
+            <div class="card-title h5">
+              Game Status:
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card-title">
+              <?php if ($gameStatus == "pre") {
+                echo "Pregame";
+              } elseif ($gameStatus == "in") { 
+                echo "Playing";
+              } elseif ($gameStatus == "post") {
+                echo "Postgame";
+              } ?>
+            </div>
+          </div>
+        </div>
+        <div class="justify-content-md-center row">
+          <div class="col-md-2">
+            <div class="card-title h5">
+              <?=$teamID?> Score:
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card-title">
+              <?=$myScore?>
+            </div>
+          </div>
+        </div>
+        <div class="justify-content-md-center row">
+          <div class="col-md-2">
+            <div class="card-title h5">
+              <?=$opponentID?> Score:
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card-title">
+              <?=$theirScore?>
+            </div>
+          </div>
+        </div>
+        <?php } ?>
       </div>
     </div>
   </div>
