@@ -13,13 +13,13 @@
 
 $menuEntries = Array(
 	Array(
-		'text' => 'NFL Touchdown',
+		'text' => 'NFL Touchdown Setup',
 		'type' => 'content',
 		'page' => 'content.php',
 		'wrap' => 1
 	),
 	Array(
-		'text' => 'NFL Touchdown',
+		'text' => 'NFL Team Status',
 		'type' => 'status',
 		'page' => 'status.php',
 		'wrap' => 1
