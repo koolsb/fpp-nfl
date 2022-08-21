@@ -12,6 +12,7 @@ logEntry("Starting NFL Plugin");
 
 $teamID = "";
 $touchdownSequence = "";
+$fieldgoalSequence = "";
 $winSequence = "";
 $teamScore = 0;
 $oppoScore = 0;
@@ -30,6 +31,7 @@ while(true) {
   $pluginSettings = parse_ini_file($pluginConfigFile);
   $teamID = urldecode($pluginSettings['teamID']);
   $touchdownSequence = urldecode($pluginSettings['touchdownSequence']);
+  $fieldgoalSequence = urldecode($pluginSettings['fieldgoalSequence']);
   $winSequence = urldecode($pluginSettings['winSequence']);
   $myScore = urldecode($pluginSettings['myScore']);
   $theirScore = urldecode($pluginSettings['theirScore']);
@@ -77,6 +79,13 @@ while(true) {
             insertPlaylistImmediate($touchdownSequence);
             logEntry("Touchdown! Playing sequence.");
             echo "Touchdown! Playing sequence.";
+          }
+        } elseif ($teamScore + 3 == $game['competitions'][0]['competitors'][$teamIndex]['score']) {
+          //play fieldgoal sequence if set
+          if ($fieldgoalSequence != '') {
+            insertPlaylistImmediate($fieldgoalSequence);
+            logEntry("Fieldgoal! Playing sequence.");
+            echo "Fieldgoal! Playing sequence.";
           }
         }
         

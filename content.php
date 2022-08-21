@@ -14,6 +14,9 @@ if (strlen(urldecode($pluginSettings['teamID']))<1){
 if (strlen(urldecode($pluginSettings['touchdownSequence']))<1){
   WriteSettingToFile("touchdownSequence",urlencode(""),$pluginName);
 }
+if (strlen(urldecode($pluginSettings['fieldgoalSequence']))<1){
+  WriteSettingToFile("fieldgoalSequence",urlencode(""),$pluginName);
+}
 if (strlen(urldecode($pluginSettings['winSequence']))<1){
   WriteSettingToFile("winSequence",urlencode(""),$pluginName);
 }
@@ -32,6 +35,12 @@ if (isset($_POST['updateTouchdownSequence'])) {
   $touchdownSequence = trim($_POST['touchdownSequence']);
   WriteSettingToFile("touchdownSequence",$touchdownSequence,$pluginName);
   echo "<script type=\"text/javascript\">$.jGrowl('Touchdown Sequence Updated',{themeState:'success'});</script>";
+}
+
+if (isset($_POST['updateFieldgoalSequence'])) { 
+  $fieldgoalSequence = trim($_POST['fieldgoalSequence']);
+  WriteSettingToFile("fieldgoalSequence",$fieldgoalSequence,$pluginName);
+  echo "<script type=\"text/javascript\">$.jGrowl('Fieldgoal Sequence Updated',{themeState:'success'});</script>";
 }
 
 if (isset($_POST['updateWinSequence'])) { 
@@ -170,6 +179,37 @@ $teams = $result['sports']['0']['leagues']['0']['teams'];
                 </select>
                 <span class="input-group-btn">
                   <button id="updateTouchdownSequence" name="updateTouchdownSequence" class="btn mr-md-3 btn-dark" type="submit">Update</button>
+                </span>
+              </div>
+            </form>
+          </div>
+        </div>
+        <!-- Fieldgoal Sequence -->
+        <div class="justify-content-md-center row pb-5">
+          <div class="col-md-6">
+            <div class="card-title h5">
+              Fieldgoal Sequence
+            </div>
+            <div class="mb-2 text-muted small h6">
+              Select the sequence to play on a fieldgoal<br>Select no sequence to disable
+            </div>
+          </div>
+          <div class="col-md-6">
+            <form method="post">
+              <div class="input-group">
+                <select class="form-select" id="fieldgoalSequence" name="fieldgoalSequence">
+                  <option selected value=""></option>
+                  <?php foreach ($sequences as $sequence) {
+                          if ($sequence == $fieldgoalSequence) {
+                            echo '<option selected value="' . $sequence . '">' . $sequence . '</option>';
+                          } else {
+                            echo '<option value="' . $sequence . '">' . $sequence . '</option>';
+                          }
+                          echo $sequence;
+                  } ?>
+                </select>
+                <span class="input-group-btn">
+                  <button id="updateFieldgoalSequence" name="updateFieldgoalSequence" class="btn mr-md-3 btn-dark" type="submit">Update</button>
                 </span>
               </div>
             </form>
