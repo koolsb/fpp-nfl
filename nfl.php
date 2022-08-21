@@ -18,6 +18,7 @@ $teamScore = 0;
 $oppoScore = 0;
 $gameState = 'pre';
 $sleepTime = 600;
+$logLevel = 0;
 
 //game status fields
 $opponentID = "";
@@ -35,9 +36,15 @@ while(true) {
   $winSequence = urldecode($pluginSettings['winSequence']);
   $myScore = urldecode($pluginSettings['myScore']);
   $theirScore = urldecode($pluginSettings['theirScore']);
+  $logLevel = urldecode($pluginConfigFile['logLevel']);
 
 
   if ($teamID != '') {
+    //log polling
+    if ($logLevel >= 5) {
+      logEntry("Polling ESPN API");
+      echo "Polling ESPN API";
+    }
     //get NFL score
     $url = "http://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard";
     $options = array(
