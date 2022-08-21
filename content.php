@@ -269,8 +269,8 @@ $teams = $result['sports']['0']['leagues']['0']['teams'];
             <form method="post">
               <div class="input-group">
                 <select class="form-select" id="logLevel" name="logLevel">
-                  <option <?php if ($logLevel = 4) { echo 'selected '; } ?>value="4">Info</option>
-                  <option <?php if ($logLevel = 5) { echo 'selected '; } ?>value="5">Debug</option>
+                  <option <?php if ($logLevel == 4) { echo 'selected '; } ?>value="4">Info</option>
+                  <option <?php if ($logLevel == 5) { echo 'selected '; } ?>value="5">Debug</option>
                 </select>
                 <span class="input-group-btn">
                   <button id="updateLogLevel" name="updateLogLevel" class="btn mr-md-3 btn-dark" type="submit">Update</button>
