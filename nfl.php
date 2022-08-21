@@ -148,7 +148,10 @@ while(true) {
     }
     
     //log if no game found
-    if (!$gameFound) {
+    if ($gameFound) {
+      logEntry("Team found this week: " . $game['date']);
+      echo "Team found this week: " . $game['date'];
+    } else {
       logEntry("Team not found this week.");
       echo "Team not found this week.";
       WriteSettingToFile("kickoff","0",$pluginName);
