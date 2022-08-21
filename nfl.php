@@ -50,9 +50,12 @@ while(true) {
     $games = json_decode($games, true);
     $games = $games['events'];
 
+    $gameFound = false;
+
     foreach($games as $game) {
-      echo $game['shortName'];
       if (strpos($game['shortName'], $teamID) !== false) {
+
+        $gameFound = true;
 
         // set kickoff time
         WriteSettingToFile("kickoff",$game['date'],$pluginName);
@@ -134,12 +137,16 @@ while(true) {
           $sleepTime = 600;
         }
         break;
-      } else {
-        logEntry("Team not found this week.");
-        echo "Team not found this week.";
-        WriteSettingToFile("kickoff","0",$pluginName);
       }
-    }      
+    }
+    
+    //log if no game found
+    if (!$gameFound) {
+      logEntry("Team not found this week.");
+      echo "Team not found this week.";
+      WriteSettingToFile("kickoff","0",$pluginName);
+    }
+
   }
 
   sleep($sleepTime);

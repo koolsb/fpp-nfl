@@ -20,6 +20,9 @@ if (strlen(urldecode($pluginSettings['fieldgoalSequence']))<1){
 if (strlen(urldecode($pluginSettings['winSequence']))<1){
   WriteSettingToFile("winSequence",urlencode(""),$pluginName);
 }
+if (strlen(urldecode($pluginSettings['logLevel']))<1){
+  WriteSettingToFile("logLevel",urlencode("4"),$pluginName);
+}
 
 foreach ($pluginSettings as $key => $value) { 
   ${$key} = urldecode($value);
@@ -46,7 +49,13 @@ if (isset($_POST['updateFieldgoalSequence'])) {
 if (isset($_POST['updateWinSequence'])) { 
   $winSequence = trim($_POST['winSequence']);
   WriteSettingToFile("winSequence",$winSequence,$pluginName);
-  echo "<script type=\"text/javascript\">$.jGrowl('NFL Team Updated',{themeState:'success'});</script>";
+  echo "<script type=\"text/javascript\">$.jGrowl('Win Sequence Updated',{themeState:'success'});</script>";
+}
+
+if (isset($_POST['updateLogLevel'])) { 
+  $logLevel = trim($_POST['logLevel']);
+  WriteSettingToFile("logLevel",$logLevel,$pluginName);
+  echo "<script type=\"text/javascript\">$.jGrowl('Log Level Updated',{themeState:'success'});</script>";
 }
 
 //get available sequences
@@ -241,6 +250,30 @@ $teams = $result['sports']['0']['leagues']['0']['teams'];
                 </select>
                 <span class="input-group-btn">
                   <button id="updateWinSequence" name="updateWinSequence" class="btn mr-md-3 btn-dark" type="submit">Update</button>
+                </span>
+              </div>
+            </form>
+          </div>
+        </div>
+        <!-- Log Level -->
+        <div class="justify-content-md-center row ">
+          <div class="col-md-6">
+            <div class="card-title h5">
+              Log Level
+            </div>
+            <div class="mb-2 text-muted small h6">
+              Info: Logs each sequence played<br>Debug: Logs each poll to ESPN API
+            </div>
+          </div>
+          <div class="col-md-6">
+            <form method="post">
+              <div class="input-group">
+                <select class="form-select" id="logLevel" name="logLevel">
+                  <option <?php if ($logLevel = 4) { echo 'selected '; } ?>value="4">Info</option>
+                  <option <?php if ($logLevel = 4) { echo 'selected '; } ?>value="5">Debug</option>
+                </select>
+                <span class="input-group-btn">
+                  <button id="updateLogLevel" name="updateLogLevel" class="btn mr-md-3 btn-dark" type="submit">Update</button>
                 </span>
               </div>
             </form>
