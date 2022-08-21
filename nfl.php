@@ -36,7 +36,7 @@ while(true) {
   $winSequence = urldecode($pluginSettings['winSequence']);
   $myScore = urldecode($pluginSettings['myScore']);
   $theirScore = urldecode($pluginSettings['theirScore']);
-  $logLevel = urldecode($pluginConfigFile['logLevel']);
+  $logLevel = urldecode($pluginSettings['logLevel']);
 
 
   if ($teamID != '') {
