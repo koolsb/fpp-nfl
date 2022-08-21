@@ -225,7 +225,7 @@ $teams = $result['sports']['0']['leagues']['0']['teams'];
           </div>
         </div>
         <!-- Win Sequence -->
-        <div class="justify-content-md-center row ">
+        <div class="justify-content-md-center row pb-5">
           <div class="col-md-6">
             <div class="card-title h5">
               Win Sequence
@@ -270,7 +270,7 @@ $teams = $result['sports']['0']['leagues']['0']['teams'];
               <div class="input-group">
                 <select class="form-select" id="logLevel" name="logLevel">
                   <option <?php if ($logLevel = 4) { echo 'selected '; } ?>value="4">Info</option>
-                  <option <?php if ($logLevel = 4) { echo 'selected '; } ?>value="5">Debug</option>
+                  <option <?php if ($logLevel = 5) { echo 'selected '; } ?>value="5">Debug</option>
                 </select>
                 <span class="input-group-btn">
                   <button id="updateLogLevel" name="updateLogLevel" class="btn mr-md-3 btn-dark" type="submit">Update</button>
