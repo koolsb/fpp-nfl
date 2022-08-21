@@ -149,7 +149,7 @@ while(true) {
     
     //log if no game found
     if ($gameFound) {
-      logEntry("Geam found this week: " . $game['date']);
+      logEntry("Game found this week: " . $game['date']);
       echo "Game found this week: " . $game['date'];
     } else {
       logEntry("Your team is not playing this week.");
