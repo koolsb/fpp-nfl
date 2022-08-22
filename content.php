@@ -31,6 +31,7 @@ foreach ($pluginSettings as $key => $value) {
 if (isset($_POST['updateTeamID'])) { 
   $teamID = trim($_POST['teamID']);
   WriteSettingToFile("teamID",$teamID,$pluginName);
+  WriteSettingToFile("kickoff",urlencode("1"),$pluginName);
   echo "<script type=\"text/javascript\">$.jGrowl('NFL Team Updated',{themeState:'success'});</script>";
 }
 

@@ -90,7 +90,9 @@ foreach ($pluginSettings as $key => $value) {
             <div class="card-title">
               <?php if ($kickoff == "0") {
                 echo 'No game scheduled this week';
-              } else {
+              } elseif ($kickoff == "1") {
+                echo 'Your Team was Updated! Kickoff will display after next poll interval.';
+              }else {
                 $kickoff = new DateTime($kickoff, new DateTimeZone("UTC"));
                 $kickoff->setTimezone(new DateTimeZone(date_default_timezone_get()));
                 echo $kickoff->format("l, F j @ g:i A");
@@ -99,7 +101,7 @@ foreach ($pluginSettings as $key => $value) {
             </div>
           </div>
         </div>
-        <?php if ($kickoff != "0") { ?>
+        <?php if (!in_array($kickoff, array("0", "1"))) { ?>
         <div class="justify-content-md-center row">
           <div class="col-md-2">
             <div class="card-title h5">
