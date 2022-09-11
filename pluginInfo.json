@@ -3,8 +3,8 @@
 	"name": "NFL Touchdown2",
 	"author": "Ben Kools (koolsb)",
 	"description": "Automatically play a celebratory sequence when your NFL team scores or wins!",
-	"homeURL": "https://github.com/koolsb/fpp-nfl",
-	"srcURL": "https://github.com/koolsb/fpp-nfl.git",
+	"homeURL": "https://github.com/Poporacer/fpp-nfl",
+	"srcURL": "https://github.com/Poporacer/fpp-nfl.git",
 	"bugURL": "https://github.com/koolsb/fpp-nfl/issues",
 	"allowUpdates": 1,
 	"versions": [
