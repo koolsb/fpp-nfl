@@ -1,9 +1,5 @@
 #!/bin/bash
 
-# fpp-nfl install script
-
-# Mark to reboot
-
 pushd $(dirname $(which $0))
 target_PWD=$(readlink -f .)
 /opt/fpp/scripts/update_plugin ${target_PWD##*/}
