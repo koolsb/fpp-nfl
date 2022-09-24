@@ -90,9 +90,7 @@ foreach ($pluginSettings as $key => $value) {
               NFL Team
             </div>
             <div class="mb-2 text-muted small h6">
-              Select your NFL team<br><br>
-              The ESPN API is only polled on 10 minute intervals when your team is not<br>playing. 
-              Changing your team may not be reflected until the next polling interval.
+              Select your NFL team
             </div>
           </div>
           <div class="col-md-6">            
