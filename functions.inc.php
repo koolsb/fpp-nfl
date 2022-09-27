@@ -132,7 +132,7 @@ function updateTeamStatus(){
 		$winSequence="none";
 	}
 	
-	if (strlen(urldecode($pluginSettings['logLevel']))>1){
+	if (strlen(urldecode($pluginSettings['logLevel']))>0){
 		$logLevel=urldecode($pluginSettings['logLevel']);
 	}else{
 		$logLevel=0;
