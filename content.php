@@ -1,5 +1,7 @@
 <?php
 include_once "/opt/fpp/www/common.php";
+include_once 'functions.inc.php';
+
 $pluginName = basename(dirname(__FILE__));
 $pluginConfigFile = $settings['configDirectory'] ."/plugin." .$pluginName;
     
@@ -28,59 +30,6 @@ foreach ($pluginSettings as $key => $value) {
   ${$key} = urldecode($value);
 }
 
-if (isset($_POST['updateTeamID'])) { 
-  $teamID = trim($_POST['teamID']);
-  WriteSettingToFile("teamID",$teamID,$pluginName);
-  WriteSettingToFile("kickoff",urlencode("1"),$pluginName);
-  echo "<script type=\"text/javascript\">$.jGrowl('NFL Team Updated',{themeState:'success'});</script>";
-}
-
-if (isset($_POST['updateTouchdownSequence'])) { 
-  $touchdownSequence = trim($_POST['touchdownSequence']);
-  WriteSettingToFile("touchdownSequence",$touchdownSequence,$pluginName);
-  echo "<script type=\"text/javascript\">$.jGrowl('Touchdown Sequence Updated',{themeState:'success'});</script>";
-}
-
-if (isset($_POST['updateFieldgoalSequence'])) { 
-  $fieldgoalSequence = trim($_POST['fieldgoalSequence']);
-  WriteSettingToFile("fieldgoalSequence",$fieldgoalSequence,$pluginName);
-  echo "<script type=\"text/javascript\">$.jGrowl('Fieldgoal Sequence Updated',{themeState:'success'});</script>";
-}
-
-if (isset($_POST['updateWinSequence'])) { 
-  $winSequence = trim($_POST['winSequence']);
-  WriteSettingToFile("winSequence",$winSequence,$pluginName);
-  echo "<script type=\"text/javascript\">$.jGrowl('Win Sequence Updated',{themeState:'success'});</script>";
-}
-
-if (isset($_POST['updateLogLevel'])) { 
-  $logLevel = trim($_POST['logLevel']);
-  WriteSettingToFile("logLevel",$logLevel,$pluginName);
-  echo "<script type=\"text/javascript\">$.jGrowl('Log Level Updated',{themeState:'success'});</script>";
-}
-
-//get available sequences
-$url = "http://127.0.0.1/api/sequence/";
-$options = array(
-  'http' => array(
-    'method'  => 'GET',
-    )
-);
-$context = stream_context_create( $options );
-$result = file_get_contents( $url, false, $context );
-$sequences = json_decode($result, true);
-
-//get NFL teams
-$url = "http://site.api.espn.com/apis/site/v2/sports/football/nfl/teams";
-$options = array(
-  'http' => array(
-    'method'  => 'GET',
-    )
-);
-$context = stream_context_create( $options );
-$result = file_get_contents( $url, false, $context );
-$result = json_decode($result, true);
-$teams = $result['sports']['0']['leagues']['0']['teams'];
 ?>
 
 <!DOCTYPE html>
@@ -129,38 +78,25 @@ $teams = $result['sports']['0']['leagues']['0']['teams'];
         </div>
       </div>
     <div class="container-fluid">
+	
       <div class="card">
+		<div  style= "height:100; width:100; margin:auto">
+			<img id="logoImage" src="<?echo $teamLogo;?>" width="100" height ="100">
+		</div>
         <!-- NFL Team -->
-        <div class="justify-content-md-center row pt-4 pb-4">
-          <div class="col-md-6">
+        <div class="justify-content-md-center row pt-4 pb-4">		
+          <div class="col-md-6">		  
             <div class="card-title h5">
               NFL Team
             </div>
             <div class="mb-2 text-muted small h6">
-              Select your NFL team<br><br>
-              The ESPN API is only polled on 10 minute intervals when your team is not<br>playing. 
-              Changing your team may not be reflected until the next polling interval.
+              Select your NFL team
             </div>
           </div>
-          <div class="col-md-6">
-            <form method="post">
-              <div class="input-group">
-                <select class="form-select" id="teamID" name="teamID">
-                  <option selected value=""></option>
-                  <?php foreach ($teams as $team) {
-                          $team = $team['team'];
-                          if ($team['abbreviation'] == $teamID) {
-                            echo '<option selected value="' . $team['abbreviation'] . '">' . $team['displayName'] . '</option>';
-                          } else {
-                            echo '<option value="' . $team['abbreviation'] . '">' . $team['displayName'] . '</option>';
-                          }
-                  } ?>
-                </select>
-                <span class="input-group-btn">
-                  <button id="updateTeamID" name="updateTeamID" class="btn mr-md-3 btn-dark" type="submit">Update</button>
-                </span>
-              </div>
-            </form>
+          <div class="col-md-6">            
+              <div class="input-group">				
+                <? PrintSettingSelect("teamID", "teamID", 0, 0, $defaultValue="", getTeamList(), $pluginName, $callbackName = "updateLogo", $changedFunction = "");?>				
+              </div>            
           </div>
         </div>
         <!-- Touchdown Sequence -->
@@ -173,25 +109,10 @@ $teams = $result['sports']['0']['leagues']['0']['teams'];
               Select the sequence to play on a touchdown<br>Select no sequence to disable
             </div>
           </div>
-          <div class="col-md-6">
-            <form method="post">
+          <div class="col-md-6">            
               <div class="input-group">
-                <select class="form-select" id="touchdownSequence" name="touchdownSequence">
-                  <option selected value=""></option>
-                  <?php foreach ($sequences as $sequence) {
-                          if ($sequence == $touchdownSequence) {
-                            echo '<option selected value="' . $sequence . '">' . $sequence . '</option>';
-                          } else {
-                            echo '<option value="' . $sequence . '">' . $sequence . '</option>';
-                          }
-                          echo $sequence;
-                  } ?>
-                </select>
-                <span class="input-group-btn">
-                  <button id="updateTouchdownSequence" name="updateTouchdownSequence" class="btn mr-md-3 btn-dark" type="submit">Update</button>
-                </span>
-              </div>
-            </form>
+                <? PrintSettingSelect("touchdownSequence", "touchdownSequence", 0, 0, $defaultValue="", getSequences(), $pluginName, $callbackName = "", $changedFunction = ""); ?>
+              </div>            
           </div>
         </div>
         <!-- Fieldgoal Sequence -->
@@ -204,25 +125,10 @@ $teams = $result['sports']['0']['leagues']['0']['teams'];
               Select the sequence to play on a fieldgoal<br>Select no sequence to disable
             </div>
           </div>
-          <div class="col-md-6">
-            <form method="post">
+          <div class="col-md-6">            
               <div class="input-group">
-                <select class="form-select" id="fieldgoalSequence" name="fieldgoalSequence">
-                  <option selected value=""></option>
-                  <?php foreach ($sequences as $sequence) {
-                          if ($sequence == $fieldgoalSequence) {
-                            echo '<option selected value="' . $sequence . '">' . $sequence . '</option>';
-                          } else {
-                            echo '<option value="' . $sequence . '">' . $sequence . '</option>';
-                          }
-                          echo $sequence;
-                  } ?>
-                </select>
-                <span class="input-group-btn">
-                  <button id="updateFieldgoalSequence" name="updateFieldgoalSequence" class="btn mr-md-3 btn-dark" type="submit">Update</button>
-                </span>
-              </div>
-            </form>
+                 <? PrintSettingSelect("fieldgoalSequence", "fieldgoalSequence", 0, 0, $defaultValue="", getSequences(), $pluginName, $callbackName = "", $changedFunction = ""); ?>                
+              </div>           
           </div>
         </div>
         <!-- Win Sequence -->
@@ -235,25 +141,10 @@ $teams = $result['sports']['0']['leagues']['0']['teams'];
               Select the sequence to play if your team wins<br>Select no sequence to disable
             </div>
           </div>
-          <div class="col-md-6">
-            <form method="post">
+          <div class="col-md-6">            
               <div class="input-group">
-                <select class="form-select" id="winSequence" name="winSequence">
-                  <option selected value=""></option>
-                  <?php foreach ($sequences as $sequence) {
-                          if ($sequence == $winSequence) {
-                            echo '<option selected value="' . $sequence . '">' . $sequence . '</option>';
-                          } else {
-                            echo '<option value="' . $sequence . '">' . $sequence . '</option>';
-                          }
-                          echo $sequence;
-                  } ?>
-                </select>
-                <span class="input-group-btn">
-                  <button id="updateWinSequence" name="updateWinSequence" class="btn mr-md-3 btn-dark" type="submit">Update</button>
-                </span>
-              </div>
-            </form>
+                <? PrintSettingSelect("winSequence", "winSequence", 0, 0, $defaultValue="", getSequences(), $pluginName, $callbackName = "", $changedFunction = ""); ?>                
+              </div>            
           </div>
         </div>
         <!-- Log Level -->
@@ -266,23 +157,66 @@ $teams = $result['sports']['0']['leagues']['0']['teams'];
               Info: Logs each sequence played<br>Debug: Logs each poll to ESPN API
             </div>
           </div>
-          <div class="col-md-6">
-            <form method="post">
+          <div class="col-md-6">            
               <div class="input-group">
-                <select class="form-select" id="logLevel" name="logLevel">
-                  <option <?php if ($logLevel == 4) { echo 'selected '; } ?>value="4">Info</option>
-                  <option <?php if ($logLevel == 5) { echo 'selected '; } ?>value="5">Debug</option>
-                </select>
-                <span class="input-group-btn">
-                  <button id="updateLogLevel" name="updateLogLevel" class="btn mr-md-3 btn-dark" type="submit">Update</button>
-                </span>
-              </div>
-            </form>
+			  <? PrintSettingSelect("logLevel", "logLevel", 0, 0, $defaultValue="", Array("Info" => "4", "Debug" => "5"), $pluginName, $callbackName = "", $changedFunction = ""); ?>               
+              </div>            
+          </div>
+        </div>
+		<div class="justify-content-md-center row ">
+			<div class="col-md-6">
+				<div class="card-title h5">
+					Enable Plugin
+				</div>
+				<div class="mb-2 text-muted small h6">
+				The plugin is enabled when checked
+				</div>
+          </div>
+          <div class="col-md-6">            
+              <div>
+			  <?PrintSettingCheckbox("NFLPlugin", "ENABLED", 0, 0, "ON", "OFF", $pluginName ,$callbackName = "setEnabledStatus", $changedFunction = ""); ?>               
+              </div>            
           </div>
         </div>
       </div>
     </div>
   </div>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
+  <script>
+  
+  function updateLogo(){
+		
+	$.ajax({ 
+		url: 'plugin.php?_menu=status&plugin=fpp-nfl&nopage=1&page=functions.inc.php',
+        data: {action: 'getLogo'},
+        type: 'post',
+        success: function(output) {
+            $.ajax({ 
+			url: 'api/plugin/fpp-nfl/settings/teamLogo',       
+			type: 'get',
+			success: function(data) {		
+				var logo= data.teamLogo;
+				document.getElementById('logoImage').src = logo;					
+			}
+		});
+        }
+	});
+		
+  }
+  function setEnabledStatus(){
+	$.ajax({ 
+		url: 'plugin.php?_menu=status&plugin=fpp-nfl&nopage=1&page=nfl.php',
+		type: 'post',
+        success: function(result) {
+			console.log (result);
+		}
+           
+		
+       
+	});
+		
+   
+  }
+  </script>
+ 
 </body>
 </html>
