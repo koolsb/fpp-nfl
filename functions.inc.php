@@ -156,12 +156,16 @@ function updateTeamStatus(){
 		$myScore="0";
 	}
 	
+	if (strlen(urldecode($pluginSettings['gameStatus']))>1){
+		$gameStatus=urldecode($pluginSettings['gameStatus']);
+	}else{
+		$gameStatus="";
+	}
+
 	//Reset Scores	
 	$theirScore= 0;
 	$teamScore = 0;
 	$oppoScore = 0;
-	$gameStatus = "";
-	$gameState = 'pre';
 	$sleepTime = 600; 
 	
 	if ($teamID != '') {
@@ -240,15 +244,9 @@ function updateTeamStatus(){
 					WriteSettingToFile("theirScore",$game['competitions'][0]['competitors'][$oppoIndex]['score'],$pluginName);
 				}
 
-				//update stored game status
-				if ($gameStatus != $game['status']['type']['state']) {
-					WriteSettingToFile("gameStatus",$game['status']['type']['state'],$pluginName);
-				}
-
 				//update sleep timer
 				switch ($game['status']['type']['state']){
 					case "pre":
-						$gameState = 'pre';
 						$now = new DateTime();
 						$gameDate = new DateTime($game['date']);
 						$timeToGame = $gameDate->getTimestamp() - $now->getTimestamp();
@@ -257,11 +255,10 @@ function updateTeamStatus(){
 						}
 						break;
 					case "in":						
-						$gameState = 'in';
 						$sleepTime = 5;
 						break;
 					case "post":
-						if ($gameState == 'in') {
+						if ($gameStatus == 'in') {
 							if ($teamScore > $oppoScore) {
 								if ($winSequence != 'none') {
 									insertPlaylistImmediate($winSequence);
@@ -271,12 +268,17 @@ function updateTeamStatus(){
 								}
 							}
 						}
-						$gameState = 'post';
 						$sleepTime = 600;
 						break;
 					default:
 						$sleepTime = 600;					
-				}			
+				}
+
+				//update stored game status
+				if ($gameStatus != $game['status']['type']['state']) {
+					WriteSettingToFile("gameStatus",$game['status']['type']['state'],$pluginName);
+				}
+
 				break;
 			}
 			
