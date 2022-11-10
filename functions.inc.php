@@ -16,40 +16,60 @@ if (file_exists($pluginConfigFile)) {
 if(isset($_POST['action']) && !empty($_POST['action'])) {
     $action = $_POST['action'];
     switch($action) {
-        case 'getLogo' : getLogo();
+        case 'getNFLLogo' : updateTeam();
+			break;
+		case 'getNCAALogo' : updateTeam("ncaa");
 			break;
         case 'blah' : blah();
 			break;        
     }
 }
 
-function getTeams(){
-$opponentID = "";
-$kickoff = "";
-$gameStatus = "";
-$myScore = "";
-$theirScore = "";
-
-$url = "http://site.api.espn.com/apis/site/v2/sports/football/nfl/teams";
-$options = array(
-  'http' => array(
-    'method'  => 'GET',
-    )
-);
-$context = stream_context_create( $options );
-$result = file_get_contents( $url, false, $context );
-$result = json_decode($result, true);
-$teams = $result['sports']['0']['leagues']['0']['teams'];
-return $teams;
-}
-
-function getTeamList(){ //get array of teams with display name and abbreviation
-	$teamsList= getTeams();  
-	foreach ($teamsList as $team) {
+function getNFLTeams(){
+	$url = "http://site.api.espn.com/apis/site/v2/sports/football/nfl/teams";
+	$options = array(
+	'http' => array(
+		'method'  => 'GET',
+		)
+	);
+	$context = stream_context_create( $options );
+	$result = file_get_contents( $url, false, $context );
+	$result = json_decode($result, true);
+	$teams = $result['sports']['0']['leagues']['0']['teams'];
+	foreach ($teams as $team) {
 		$team = $team['team'];
         $teamNames[$team['displayName']] = $team['abbreviation'];		
 	}	
-	return $teamNames;		
+	return $teamNames;
+}
+
+function getNCAATeams(){
+	$url = "http://site.api.espn.com/apis/v2/sports/football/college-football/standings";
+	$options = array(
+  		'http' => array(
+    		'method'  => 'GET',
+    	)
+	);
+	$context = stream_context_create( $options );
+	$result = file_get_contents( $url, false, $context );
+	$result = json_decode($result, true);
+	$teams = array();
+	$conferences = $result['children'];
+	foreach ($conferences as $conference) {
+		if (array_key_exists("children", $conference)) {
+			foreach($conference['children'] as $subConference) {
+				foreach ($subConference['standings']['entries'] as $team) {
+					$teamNames[$team['team']['displayName']] = $team['team']['abbreviation'];
+				}
+			}
+		} else {
+			foreach ($conference['standings']['entries'] as $team) {
+				$teamNames[$team['team']['displayName']] = $team['team']['abbreviation'];
+			}
+		}	
+	}
+	ksort($teamNames);
+	return $teamNames;
 }
 
 function getSequences(){
@@ -69,37 +89,49 @@ function getSequences(){
 	return $sequenceList;
 }
 
-function getLogo(){
-	logEntry("Updating Team and logo");
+function getTeamLogo($team, $league="nfl"){
+	if ($league == "ncaa") {
+		$league = "college-football";
+	}
+	$url = "http://site.api.espn.com/apis/site/v2/sports/football/{$league}/teams/{$team}";
+	$options = array(
+  		'http' => array(
+    		'method'  => 'GET',
+    	)
+	);
+	$context = stream_context_create( $options );
+	$result = file_get_contents( $url, false, $context );
+	$result = json_decode($result, true);
+
+	$teamLogo = $result['team']['logos'][0]['href'];
+
+	return $teamLogo;
+
+}
+
+function updateTeam($league="nfl"){
+	logEntry("Updating {$league} Team and logo");
 	global $pluginName;
 	global $pluginSettings;
-	
+
 	//clear old scores
 	WriteSettingToFile("myScore",0,$pluginName);
 	WriteSettingToFile("theirScore",0,$pluginName);
-	
+
 	//configure variables
-	if (strlen(urldecode($pluginSettings['teamID']))>1){
-		$teamID=urldecode($pluginSettings['teamID']);
+	if (strlen(urldecode($pluginSettings["{$league}TeamID"]))>1){
+		$teamID=urldecode($pluginSettings["{$league}TeamID"]);
 	}else{
 		$teamID=""; 
 	}
+
+	$teamLogo = getTeamLogo($teamID, $league);
+	WriteSettingToFile("{$league}TeamLogo",$teamLogo,$pluginName);
 	
-	$teamsList= getTeams();
-	$teamLogo = "";
-	
-	foreach ($teamsList as $team) {		
-		$team = $team['team'];
-		
-		if ($team['abbreviation']==$teamID){
-			$teamLogo= $team['logos'][0]['href'];
-			WriteSettingToFile("teamLogo",$teamLogo,$pluginName);
-			break;
-		}         	
-	}
-	logEntry("Logo updated " . $teamLogo);
+	logEntry("{$league} Logo updated " . $teamLogo);
 	$temp= updateTeamStatus();
-	return $teamLogo;	
+	return $teamLogo;
+
 }
 
 function updateTeamStatus(){
