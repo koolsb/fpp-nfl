@@ -9,14 +9,14 @@ $pluginConfigFile = $settings['configDirectory'] . "/plugin." .$pluginName;
 $pluginSettings = parse_ini_file($pluginConfigFile);
 
 logEntry("Starting NFL Plugin");
-$teamID = "";
+$nflTeamID = "";
 
 $loopState=true;
 
 while($loopState) {
 	$pluginSettings = parse_ini_file($pluginConfigFile); //check if needed
 	$enabledState= urldecode($pluginSettings['ENABLED']);
-	$teamID = urldecode($pluginSettings['teamID']);
+	$nflTeamID = urldecode($pluginSettings['nflTeamID']);
 		
 	if ($enabledState== "OFF"){
 		$loopState=false; 

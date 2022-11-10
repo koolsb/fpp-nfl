@@ -10,17 +10,29 @@ if (file_exists($pluginConfigFile)) {
 }
 
 //set defaults if nothing saved
-if (strlen(urldecode($pluginSettings['teamID']))<1){
-  WriteSettingToFile("teamID",urlencode(""),$pluginName);
+if (strlen(urldecode($pluginSettings['nflTeamID']))<1){
+  WriteSettingToFile("nflTeamID",urlencode(""),$pluginName);
 }
-if (strlen(urldecode($pluginSettings['touchdownSequence']))<1){
-  WriteSettingToFile("touchdownSequence",urlencode(""),$pluginName);
+if (strlen(urldecode($pluginSettings['nflTouchdownSequence']))<1){
+  WriteSettingToFile("nflTouchdownSequence",urlencode(""),$pluginName);
 }
-if (strlen(urldecode($pluginSettings['fieldgoalSequence']))<1){
-  WriteSettingToFile("fieldgoalSequence",urlencode(""),$pluginName);
+if (strlen(urldecode($pluginSettings['nflFieldgoalSequence']))<1){
+  WriteSettingToFile("nflFieldgoalSequence",urlencode(""),$pluginName);
 }
-if (strlen(urldecode($pluginSettings['winSequence']))<1){
-  WriteSettingToFile("winSequence",urlencode(""),$pluginName);
+if (strlen(urldecode($pluginSettings['nflWinSequence']))<1){
+  WriteSettingToFile("nflWinSequence",urlencode(""),$pluginName);
+}
+if (strlen(urldecode($pluginSettings['ncaaTeamID']))<1){
+  WriteSettingToFile("ncaaTeamID",urlencode(""),$pluginName);
+}
+if (strlen(urldecode($pluginSettings['ncaaTouchdownSequence']))<1){
+  WriteSettingToFile("ncaaTouchdownSequence",urlencode(""),$pluginName);
+}
+if (strlen(urldecode($pluginSettings['ncaaFieldgoalSequence']))<1){
+  WriteSettingToFile("ncaaFieldgoalSequence",urlencode(""),$pluginName);
+}
+if (strlen(urldecode($pluginSettings['ncaaWinSequence']))<1){
+  WriteSettingToFile("ncaaWinSequence",urlencode(""),$pluginName);
 }
 if (strlen(urldecode($pluginSettings['logLevel']))<1){
   WriteSettingToFile("logLevel",urlencode("4"),$pluginName);
