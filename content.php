@@ -80,9 +80,20 @@ foreach ($pluginSettings as $key => $value) {
     <div class="container-fluid">
 	
       <div class="card">
-		<div  style= "height:100; width:100; margin:auto">
-			<img id="logoImage" src="<?echo $teamLogo;?>" width="100" height ="100">
-		</div>
+        <ul class="nav nav-tabs">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="#">Settings</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">NFL Team</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">NCAA Team</a>
+          </li>
+        </ul>
+		    <div style= "height:100; width:100; margin:auto">
+			    <img id="logoImage" src="<?echo $teamLogo;?>" width="100" height ="100">
+		    </div>
         <!-- NFL Team -->
         <div class="justify-content-md-center row pt-4 pb-4">		
           <div class="col-md-6">		  
