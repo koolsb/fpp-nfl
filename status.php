@@ -34,6 +34,9 @@ if (strlen(urldecode($pluginSettings['nflOppoName']))<1){
 if (strlen(urldecode($pluginSettings['ncaaTeamID']))<1){
 	WriteSettingToFile("ncaaTeamID",urlencode(""),$pluginName);
 }
+if (strlen(urldecode($pluginSettings['ncaaTeamAbbreviation']))<1){
+	WriteSettingToFile("ncaaTeamAbbreviation",urlencode(""),$pluginName);
+}
 if (strlen(urldecode($pluginSettings['ncaaKickoff']))<0){
 	WriteSettingToFile("ncaaKickoff",urlencode("1"),$pluginName);
 }
@@ -267,7 +270,7 @@ if ($pluginEnabled=="OFF"){
 						<div class="justify-content-md-center row">
 							<div class="col-md-4">
 								<div class="card-title h5">
-									<?=$ncaaTeamID?> Score:
+									<?=$ncaaTeamAbbreviation?> Score:
 								</div>
 							</div>
 							<div class="col-md-7">

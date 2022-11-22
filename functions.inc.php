@@ -209,6 +209,11 @@ function updateTeamStatus($reparseSettings=false){
 	} else {
 		$ncaaTeamID="";
 	}
+	if (strlen(urldecode($pluginSettings['ncaaTeamAbbreviation']))>1){
+		$ncaaTeamAbbreviation=urldecode($pluginSettings['ncaaTeamAbbreviation']);
+	} else {
+		$ncaaTeamAbbreviation="";
+	}
 	if (strlen(urldecode($pluginSettings['ncaaTeamGroupID']))>1){
 		$ncaaTeamGroupID=urldecode($pluginSettings['ncaaTeamGroupID']);
 	} else {
@@ -416,13 +421,13 @@ function updateTeamStatus($reparseSettings=false){
 		$gameFound = false;
 
 		foreach($games as $game) {
-			if (strpos($game['shortName'], $ncaaTeamID) !== false) {
+			if (strpos($game['shortName'], $ncaaTeamAbbreviation) !== false) {
 				$gameFound = true;
 
 				// set kickoff time
 				WriteSettingToFile("ncaaKickoff",$game['date'],$pluginName);				
 
-				if ($game['competitions'][0]['competitors'][0]['team']['abbreviation'] == $ncaaTeamID) {
+				if ($game['competitions'][0]['competitors'][0]['team']['abbreviation'] == $ncaaTeamAbbreviation) {
 					$ncaaTeamIndex = 0;
 					$ncaaOppoIndex = 1;
 				} else {
