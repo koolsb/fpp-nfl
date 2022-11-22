@@ -59,12 +59,12 @@ function getNCAATeams(){
 		if (array_key_exists("children", $conference)) {
 			foreach($conference['children'] as $subConference) {
 				foreach ($subConference['standings']['entries'] as $team) {
-					$teamNames[$team['team']['displayName']] = $team['team']['abbreviation'];
+					$teamNames[$team['team']['displayName']] = $team['team']['id'];
 				}
 			}
 		} else {
 			foreach ($conference['standings']['entries'] as $team) {
-				$teamNames[$team['team']['displayName']] = $team['team']['abbreviation'];
+				$teamNames[$team['team']['displayName']] = $team['team']['id'];
 			}
 		}	
 	}
@@ -104,6 +104,7 @@ function getTeamInfo($team, $league="nfl"){
 	$result = json_decode($result, true);
 
 	$teamInfo["logo"] = $result['team']['logos'][0]['href'];
+	$teamInfo["abbreviation"] = $result['team']['abbreviation'];
 	$teamInfo["groupID"] = $result['team']['groups']['id'];
 	return $teamInfo;
 
@@ -124,13 +125,16 @@ function updateTeam($league="nfl"){
 		$teamInfo = getTeamInfo($teamID, $league);
 		$teamLogo = $teamInfo['logo'];
 		$teamGroupID = $teamInfo['groupID'];
+		$teamAbbreviation = $teamInfo['abbreviation'];
 	}else{
 		$teamLogo = "";
 	}
 	WriteSettingToFile("{$league}TeamLogo",$teamLogo,$pluginName);
 	WriteSettingToFile("{$league}TeamGroupID",$teamGroupID,$pluginName);
+	WriteSettingToFile("{$league}TeamAbbreviation",$teamAbbreviation,$pluginName);
 	logEntry("{$league} Team Group ID Updated " . $teamGroupID);
 	logEntry("{$league} Logo updated " . $teamLogo);
+	logEntry("{$league} Abbreviation updated " . $teamAbbreviation);
 	updateTeamStatus(true);
 	return $teamLogo;
 
