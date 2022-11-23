@@ -1,8 +1,8 @@
 {
 	"repoName": "fpp-nfl",
-	"name": "NFL Touchdown",
+	"name": "NFL/NCAA Touchdown",
 	"author": "Ben Kools (koolsb)",
-	"description": "Automatically play a celebratory sequence when your NFL team scores or wins!",
+	"description": "Automatically play a celebratory sequence when your NFL or NCAA team scores or wins!",
 	"homeURL": "https://github.com/koolsb/fpp-nfl",
 	"srcURL": "https://github.com/koolsb/fpp-nfl.git",
 	"bugURL": "https://github.com/koolsb/fpp-nfl/issues",
