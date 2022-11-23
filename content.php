@@ -10,17 +10,29 @@ if (file_exists($pluginConfigFile)) {
 }
 
 //set defaults if nothing saved
-if (strlen(urldecode($pluginSettings['teamID']))<1){
-  WriteSettingToFile("teamID",urlencode(""),$pluginName);
+if (strlen(urldecode($pluginSettings['nflTeamID']))<1){
+  WriteSettingToFile("nflTeamID",urlencode(""),$pluginName);
 }
-if (strlen(urldecode($pluginSettings['touchdownSequence']))<1){
-  WriteSettingToFile("touchdownSequence",urlencode(""),$pluginName);
+if (strlen(urldecode($pluginSettings['nflTouchdownSequence']))<1){
+  WriteSettingToFile("nflTouchdownSequence",urlencode(""),$pluginName);
 }
-if (strlen(urldecode($pluginSettings['fieldgoalSequence']))<1){
-  WriteSettingToFile("fieldgoalSequence",urlencode(""),$pluginName);
+if (strlen(urldecode($pluginSettings['nflFieldgoalSequence']))<1){
+  WriteSettingToFile("nflFieldgoalSequence",urlencode(""),$pluginName);
 }
-if (strlen(urldecode($pluginSettings['winSequence']))<1){
-  WriteSettingToFile("winSequence",urlencode(""),$pluginName);
+if (strlen(urldecode($pluginSettings['nflWinSequence']))<1){
+  WriteSettingToFile("nflWinSequence",urlencode(""),$pluginName);
+}
+if (strlen(urldecode($pluginSettings['ncaaTeamID']))<1){
+  WriteSettingToFile("ncaaTeamID",urlencode(""),$pluginName);
+}
+if (strlen(urldecode($pluginSettings['ncaaTouchdownSequence']))<1){
+  WriteSettingToFile("ncaaTouchdownSequence",urlencode(""),$pluginName);
+}
+if (strlen(urldecode($pluginSettings['ncaaFieldgoalSequence']))<1){
+  WriteSettingToFile("ncaaFieldgoalSequence",urlencode(""),$pluginName);
+}
+if (strlen(urldecode($pluginSettings['ncaaWinSequence']))<1){
+  WriteSettingToFile("ncaaWinSequence",urlencode(""),$pluginName);
 }
 if (strlen(urldecode($pluginSettings['logLevel']))<1){
   WriteSettingToFile("logLevel",urlencode("4"),$pluginName);
@@ -35,10 +47,8 @@ foreach ($pluginSettings as $key => $value) {
 <!DOCTYPE html>
 <html>
 <head>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css"
-    rel="stylesheet"
-    integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1"
-    crossorigin="anonymous">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
   <style>
     #bodyWrapper {
       background-color: #20222e;
@@ -73,109 +83,195 @@ foreach ($pluginSettings as $key => $value) {
       <div class="card">
         <div class="justify-content-md-center row py-3">
           <div class="col-md-auto">
-            <h1>NFL Touchdown Plugin</h1>
+            <h1>NFL/NCAA Touchdown Plugin</h1>
           </div>
         </div>
       </div>
     <div class="container-fluid">
-	
       <div class="card">
-		<div  style= "height:100; width:100; margin:auto">
-			<img id="logoImage" src="<?echo $teamLogo;?>" width="100" height ="100">
-		</div>
-        <!-- NFL Team -->
-        <div class="justify-content-md-center row pt-4 pb-4">		
-          <div class="col-md-6">		  
-            <div class="card-title h5">
-              NFL Team
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="nfl-tab" data-bs-toggle="tab" data-bs-target="#nfl" type="button" role="tab" aria-controls="nfl" aria-selected="true">NFL</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="ncaa-tab" data-bs-toggle="tab" data-bs-target="#ncaa" type="button" role="tab" aria-controls="ncaa" aria-selected="false">NCAA</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="settings-tab" data-bs-toggle="tab" data-bs-target="#settings" type="button" role="tab" aria-controls="settings" aria-selected="false">Settings</button>
+          </li>
+        </ul>
+        <div class="tab-content" id="myTabContent">
+          <div class="tab-pane fade show active" id="nfl" role="tabpanel" aria-labelledby="nfl-tab">
+            <div style= "height:100; width:100; margin:auto" class="pt-3">
+              <img id="nflLogoImage" src="<?echo $nflTeamLogo;?>" width="100" height ="100">
             </div>
-            <div class="mb-2 text-muted small h6">
-              Select your NFL team
+            <!-- NFL Team -->
+            <div class="justify-content-md-center row pt-5 py-4">		
+              <div class="col-md-6">		  
+                <div class="card-title h5">
+                  NFL Team
+                </div>
+                <div class="mb-2 text-muted small h6">
+                  Select your NFL team
+                </div>
+              </div>
+              <div class="col-md-6">            
+                  <div class="input-group">				
+                    <? PrintSettingSelect("nflTeamID", "nflTeamID", 0, 0, $defaultValue="", getNFLTeams(), $pluginName, $callbackName = "updateNFLLogo", $changedFunction = "");?>				
+                  </div>            
+              </div>
+            </div>
+            <!-- Touchdown Sequence -->
+            <div class="justify-content-md-center row pb-5">
+              <div class="col-md-6">
+                <div class="card-title h5">
+                  Touchdown Sequence
+                </div>
+                <div class="mb-2 text-muted small h6">
+                  Select the sequence to play on a touchdown<br>Select no sequence to disable
+                </div>
+              </div>
+              <div class="col-md-6">            
+                  <div class="input-group">
+                    <? PrintSettingSelect("nflTouchdownSequence", "nflTouchdownSequence", 0, 0, $defaultValue="", getSequences(), $pluginName, $callbackName = "", $changedFunction = ""); ?>
+                  </div>            
+              </div>
+            </div>
+            <!-- Fieldgoal Sequence -->
+            <div class="justify-content-md-center row pb-5">
+              <div class="col-md-6">
+                <div class="card-title h5">
+                  Fieldgoal Sequence
+                </div>
+                <div class="mb-2 text-muted small h6">
+                  Select the sequence to play on a fieldgoal<br>Select no sequence to disable
+                </div>
+              </div>
+              <div class="col-md-6">            
+                  <div class="input-group">
+                    <? PrintSettingSelect("nflFieldgoalSequence", "nflFieldgoalSequence", 0, 0, $defaultValue="", getSequences(), $pluginName, $callbackName = "", $changedFunction = ""); ?>                
+                  </div>           
+              </div>
+            </div>
+            <!-- Win Sequence -->
+            <div class="justify-content-md-center row pb-5">
+              <div class="col-md-6">
+                <div class="card-title h5">
+                  Win Sequence
+                </div>
+                <div class="mb-2 text-muted small h6">
+                  Select the sequence to play if your team wins<br>Select no sequence to disable
+                </div>
+              </div>
+              <div class="col-md-6">            
+                  <div class="input-group">
+                    <? PrintSettingSelect("nflWinSequence", "nflWinSequence", 0, 0, $defaultValue="", getSequences(), $pluginName, $callbackName = "", $changedFunction = ""); ?>                
+                  </div>            
+              </div>
             </div>
           </div>
-          <div class="col-md-6">            
-              <div class="input-group">				
-                <? PrintSettingSelect("teamID", "teamID", 0, 0, $defaultValue="", getTeamList(), $pluginName, $callbackName = "updateLogo", $changedFunction = "");?>				
-              </div>            
-          </div>
-        </div>
-        <!-- Touchdown Sequence -->
-        <div class="justify-content-md-center row pb-5">
-          <div class="col-md-6">
-            <div class="card-title h5">
-              Touchdown Sequence
+          <div class="tab-pane fade" id="ncaa" role="tabpanel" aria-labelledby="ncaa-tab">
+            <div style= "height:100; width:100; margin:auto" class="pt-3">
+              <img id="ncaaLogoImage" src="<?echo $ncaaTeamLogo;?>" width="100" height ="100">
             </div>
-            <div class="mb-2 text-muted small h6">
-              Select the sequence to play on a touchdown<br>Select no sequence to disable
+            <!-- NCAA Team -->
+            <div class="justify-content-md-center row pt-5 py-4">		
+              <div class="col-md-6">		  
+                <div class="card-title h5">
+                  NCAA Team
+                </div>
+                <div class="mb-2 text-muted small h6">
+                  Select your NCAA team
+                </div>
+              </div>
+              <div class="col-md-6">            
+                  <div class="input-group">				
+                    <? PrintSettingSelect("ncaaTeamID", "ncaaTeamID", 0, 0, $defaultValue="", getNCAATeams(), $pluginName, $callbackName = "updateNCAALogo", $changedFunction = "");?>				
+                  </div>            
+              </div>
+            </div>
+            <!-- Touchdown Sequence -->
+            <div class="justify-content-md-center row pb-5">
+              <div class="col-md-6">
+                <div class="card-title h5">
+                  Touchdown Sequence
+                </div>
+                <div class="mb-2 text-muted small h6">
+                  Select the sequence to play on a touchdown<br>Select no sequence to disable
+                </div>
+              </div>
+              <div class="col-md-6">            
+                  <div class="input-group">
+                    <? PrintSettingSelect("ncaaTouchdownSequence", "ncaaTouchdownSequence", 0, 0, $defaultValue="", getSequences(), $pluginName, $callbackName = "", $changedFunction = ""); ?>
+                  </div>            
+              </div>
+            </div>
+            <!-- Fieldgoal Sequence -->
+            <div class="justify-content-md-center row pb-5">
+              <div class="col-md-6">
+                <div class="card-title h5">
+                  Fieldgoal Sequence
+                </div>
+                <div class="mb-2 text-muted small h6">
+                  Select the sequence to play on a fieldgoal<br>Select no sequence to disable
+                </div>
+              </div>
+              <div class="col-md-6">            
+                  <div class="input-group">
+                    <? PrintSettingSelect("ncaaFieldgoalSequence", "ncaaFieldgoalSequence", 0, 0, $defaultValue="", getSequences(), $pluginName, $callbackName = "", $changedFunction = ""); ?>                
+                  </div>           
+              </div>
+            </div>
+            <!-- Win Sequence -->
+            <div class="justify-content-md-center row pb-5">
+              <div class="col-md-6">
+                <div class="card-title h5">
+                  Win Sequence
+                </div>
+                <div class="mb-2 text-muted small h6">
+                  Select the sequence to play if your team wins<br>Select no sequence to disable
+                </div>
+              </div>
+              <div class="col-md-6">            
+                  <div class="input-group">
+                    <? PrintSettingSelect("ncaaWinSequence", "ncaaWinSequence", 0, 0, $defaultValue="", getSequences(), $pluginName, $callbackName = "", $changedFunction = ""); ?>                
+                  </div>            
+              </div>
             </div>
           </div>
-          <div class="col-md-6">            
-              <div class="input-group">
-                <? PrintSettingSelect("touchdownSequence", "touchdownSequence", 0, 0, $defaultValue="", getSequences(), $pluginName, $callbackName = "", $changedFunction = ""); ?>
-              </div>            
-          </div>
-        </div>
-        <!-- Fieldgoal Sequence -->
-        <div class="justify-content-md-center row pb-5">
-          <div class="col-md-6">
-            <div class="card-title h5">
-              Fieldgoal Sequence
+          <div class="tab-pane fade" id="settings" role="tabpanel" aria-labelledby="settings-tab">
+            <!-- Enable Plugin -->
+            <div class="justify-content-md-center row pt-4">
+              <div class="col-md-6">
+                <div class="card-title h5">
+                  Enable Plugin
+                </div>
+                <div class="mb-2 text-muted small h6">
+                  The plugin is enabled when checked
+                </div>
+              </div>
+              <div class="col-md-6">            
+                <div>
+                  <?PrintSettingCheckbox("NFLPlugin", "ENABLED", 0, 0, "ON", "OFF", $pluginName ,$callbackName = "setEnabledStatus", $changedFunction = ""); ?>               
+                </div>            
+              </div>
             </div>
-            <div class="mb-2 text-muted small h6">
-              Select the sequence to play on a fieldgoal<br>Select no sequence to disable
+            <!-- Log Level -->
+            <div class="justify-content-md-center row">
+              <div class="col-md-6">
+                <div class="card-title h5">
+                  Log Level
+                </div>
+                <div class="mb-2 text-muted small h6">
+                  Info: Logs each sequence played<br>Debug: Logs each poll to ESPN API
+                </div>
+              </div>
+              <div class="col-md-6">            
+                <div class="input-group">
+                  <? PrintSettingSelect("logLevel", "logLevel", 0, 0, $defaultValue="", Array("Info" => "4", "Debug" => "5"), $pluginName, $callbackName = "", $changedFunction = ""); ?>               
+                </div>            
+              </div>
             </div>
-          </div>
-          <div class="col-md-6">            
-              <div class="input-group">
-                 <? PrintSettingSelect("fieldgoalSequence", "fieldgoalSequence", 0, 0, $defaultValue="", getSequences(), $pluginName, $callbackName = "", $changedFunction = ""); ?>                
-              </div>           
-          </div>
-        </div>
-        <!-- Win Sequence -->
-        <div class="justify-content-md-center row pb-5">
-          <div class="col-md-6">
-            <div class="card-title h5">
-              Win Sequence
-            </div>
-            <div class="mb-2 text-muted small h6">
-              Select the sequence to play if your team wins<br>Select no sequence to disable
-            </div>
-          </div>
-          <div class="col-md-6">            
-              <div class="input-group">
-                <? PrintSettingSelect("winSequence", "winSequence", 0, 0, $defaultValue="", getSequences(), $pluginName, $callbackName = "", $changedFunction = ""); ?>                
-              </div>            
-          </div>
-        </div>
-        <!-- Log Level -->
-        <div class="justify-content-md-center row ">
-          <div class="col-md-6">
-            <div class="card-title h5">
-              Log Level
-            </div>
-            <div class="mb-2 text-muted small h6">
-              Info: Logs each sequence played<br>Debug: Logs each poll to ESPN API
-            </div>
-          </div>
-          <div class="col-md-6">            
-              <div class="input-group">
-			  <? PrintSettingSelect("logLevel", "logLevel", 0, 0, $defaultValue="", Array("Info" => "4", "Debug" => "5"), $pluginName, $callbackName = "", $changedFunction = ""); ?>               
-              </div>            
-          </div>
-        </div>
-		<div class="justify-content-md-center row ">
-			<div class="col-md-6">
-				<div class="card-title h5">
-					Enable Plugin
-				</div>
-				<div class="mb-2 text-muted small h6">
-				The plugin is enabled when checked
-				</div>
-          </div>
-          <div class="col-md-6">            
-              <div>
-			  <?PrintSettingCheckbox("NFLPlugin", "ENABLED", 0, 0, "ON", "OFF", $pluginName ,$callbackName = "setEnabledStatus", $changedFunction = ""); ?>               
-              </div>            
           </div>
         </div>
       </div>
@@ -183,25 +279,44 @@ foreach ($pluginSettings as $key => $value) {
   </div>
   <script>
   
-  function updateLogo(){
+  function updateNFLLogo(){
 		
 	$.ajax({ 
 		url: 'plugin.php?_menu=status&plugin=fpp-nfl&nopage=1&page=functions.inc.php',
-        data: {action: 'getLogo'},
+        data: {action: 'getNFLLogo'},
         type: 'post',
         success: function(output) {
             $.ajax({ 
-			url: 'api/plugin/fpp-nfl/settings/teamLogo',       
+			url: 'api/plugin/fpp-nfl/settings/nflTeamLogo',       
 			type: 'get',
 			success: function(data) {		
-				var logo= data.teamLogo;
-				document.getElementById('logoImage').src = logo;					
+				var logo= data.nflTeamLogo;
+				document.getElementById('nflLogoImage').src = logo;					
 			}
 		});
         }
 	});
 		
   }
+  function updateNCAALogo(){
+		
+    $.ajax({ 
+      url: 'plugin.php?_menu=status&plugin=fpp-nfl&nopage=1&page=functions.inc.php',
+          data: {action: 'getNCAALogo'},
+          type: 'post',
+          success: function(output) {
+              $.ajax({ 
+        url: 'api/plugin/fpp-nfl/settings/ncaaTeamLogo',       
+        type: 'get',
+        success: function(data) {		
+          var logo= data.ncaaTeamLogo;
+          document.getElementById('ncaaLogoImage').src = logo;					
+        }
+      });
+          }
+    });
+      
+    }
   function setEnabledStatus(){
 	$.ajax({ 
 		url: 'plugin.php?_menu=status&plugin=fpp-nfl&nopage=1&page=nfl.php',

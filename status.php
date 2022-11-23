@@ -10,32 +10,55 @@ foreach ($pluginSettings as $key => $value) {
   ${$key} = urldecode($value);
 }
 //set defaults if nothing saved
-if (strlen(urldecode($pluginSettings['teamID']))<1){
-  WriteSettingToFile("teamID",urlencode(""),$pluginName);
+if (strlen(urldecode($pluginSettings['nflTeamID']))<1){
+  WriteSettingToFile("nflTeamID",urlencode(""),$pluginName);
 }
-if (strlen(urldecode($pluginSettings['kickoff']))<1){
-  WriteSettingToFile("kickoff",urlencode(""),$pluginName);
+if (strlen(urldecode($pluginSettings['nflKickoff']))<0){
+  WriteSettingToFile("nflKickoff",urlencode("1"),$pluginName);
 }
-if (strlen(urldecode($pluginSettings['myScore']))<1){
-  WriteSettingToFile("myScore",urlencode(""),$pluginName);
+if (strlen(urldecode($pluginSettings['nflMyScore']))<1){
+  WriteSettingToFile("nflMyScore",urlencode(""),$pluginName);
 }
-if (strlen(urldecode($pluginSettings['theirScore']))<1){
-  WriteSettingToFile("theirScore",urlencode(""),$pluginName);
+if (strlen(urldecode($pluginSettings['nflOppoScore']))<1){
+  WriteSettingToFile("nflOppoScore",urlencode(""),$pluginName);
 }
-
-if (strlen(urldecode($pluginSettings['teamLogo']))<1){
-  WriteSettingToFile("teamLogo",urlencode(""),$pluginName);
+if (strlen(urldecode($pluginSettings['nflTeamLogo']))<1){
+  WriteSettingToFile("nflTeamLogo",urlencode(""),$pluginName);
 }
-
-if (strlen(urldecode($pluginSettings['opponentID']))<1){
-  WriteSettingToFile("opponentID",urlencode(""),$pluginName);
+if (strlen(urldecode($pluginSettings['nflOppoID']))<1){
+  WriteSettingToFile("nflOppoID",urlencode(""),$pluginName);
 }
-if (strlen(urldecode($pluginSettings['opponentID']))<1){
+if (strlen(urldecode($pluginSettings['nflOppoName']))<1){
+	WriteSettingToFile("nflOppoName",urlencode(""),$pluginName);
+}	
+if (strlen(urldecode($pluginSettings['ncaaTeamID']))<1){
+	WriteSettingToFile("ncaaTeamID",urlencode(""),$pluginName);
+}
+if (strlen(urldecode($pluginSettings['ncaaTeamAbbreviation']))<1){
+	WriteSettingToFile("ncaaTeamAbbreviation",urlencode(""),$pluginName);
+}
+if (strlen(urldecode($pluginSettings['ncaaKickoff']))<0){
+	WriteSettingToFile("ncaaKickoff",urlencode("1"),$pluginName);
+}
+if (strlen(urldecode($pluginSettings['ncaaMyScore']))<1){
+	WriteSettingToFile("ncaaMyScore",urlencode(""),$pluginName);
+}
+if (strlen(urldecode($pluginSettings['ncaaOppoScore']))<1){
+	WriteSettingToFile("ncaaOppoScore",urlencode(""),$pluginName);
+}
+if (strlen(urldecode($pluginSettings['ncaaTeamLogo']))<1){
+	WriteSettingToFile("ncaaTeamLogo",urlencode(""),$pluginName);
+}
+if (strlen(urldecode($pluginSettings['ncaaOppoID']))<1){
+	WriteSettingToFile("ncaaOppoID",urlencode(""),$pluginName);
+}
+if (strlen(urldecode($pluginSettings['ncaaOppoName']))<1){
+	WriteSettingToFile("ncaaOppoName",urlencode(""),$pluginName);
+}
+if (strlen(urldecode($pluginSettings['ENABLED']))<1){
   WriteSettingToFile("ENABLED",urlencode("OFF"),$pluginName);
 }
-if (strlen(urldecode($pluginSettings['opponentName']))<1){
-  WriteSettingToFile("opponentName",urlencode(""),$pluginName);
-}													  
+												  
 foreach ($pluginSettings as $key => $value) { 
   ${$key} = urldecode($value);
 }
@@ -97,96 +120,180 @@ if ($pluginEnabled=="OFF"){
 			</div>
 		</div>
 		<div class="container-fluid">
-			<div class="card">
-				<div  style= "height:100; width:100; margin:auto">
-					<img id="logoImage" src="<?echo $teamLogo;?>" width="100" height ="100">
-				</div>												 
-        <!-- Status -->
+			<div class="card">											 
+        		<!-- Status -->
 				<div class="justify-content-md-center row pt-4 pb-5">
 					<div class="col-md-auto">
 						<h3>Game Status</h3>
-							<div style= "<? echo $showDisabledDiv; ?>color:red;">
+							<div style= "<?=$showDisabledDiv?>color:red;">
 								Notice: Plugin is disabled
 							</div>																
 					</div>          
 				</div>
 				<div class="justify-content-md-center row">
-					<div class="col-md-2">
-						<div class="card-title h5">
-							Kickoff:
+					<div class="col-6">
+						<div  style= "height:100; width:100; margin:auto">
+							<img id="logoImage" src="<?echo $nflTeamLogo;?>" width="100" height ="100">
+						</div>	
+						<div class="justify-content-md-center row pt-4">
+							<div class="col-md-4">
+								<div class="card-title h5">
+									Kickoff:
+								</div>
+							</div>
+							<div class="col-md-7">
+								<div class="card-title">
+								<?php if ($nflKickoff == "0") {
+									echo 'No game scheduled this week';
+								} elseif ($nflKickoff == "1") {
+									echo 'Your Team was Updated! Kickoff will display after next poll interval.';
+								} else {
+									$nflKickoff = new DateTime($nflKickoff, new DateTimeZone("UTC"));
+									$nflKickoff->setTimezone(new DateTimeZone(date_default_timezone_get()));
+									echo $nflKickoff->format("l, F j @ g:i A");
+								} ?>
+								</div>
+							</div>
 						</div>
+						<?php if (!in_array($nflKickoff, array("0", "1"))) { ?>
+						<div class="justify-content-md-center row">
+							<div class="col-md-4">
+								<div class="card-title h5">
+									Opponent:
+								</div>
+							</div>
+							<div class="col-md-7">
+								<div class="card-title">
+									<?=$nflOppoName?>
+								</div>
+							</div>
+						</div>
+						<div class="justify-content-md-center row pt-5">
+							<div class="col-md-4">
+								<div class="card-title h5">
+									Game Status:
+								</div>
+							</div>
+							<div class="col-md-7">
+								<div class="card-title">
+									<?php if ($nflGameStatus == "pre") {
+										echo "Pregame";
+									} elseif ($nflGameStatus == "in") { 
+										echo "Playing";
+									} elseif ($nflGameStatus == "post") {
+										echo "Postgame";
+									} ?>
+								</div>
+							</div>
+						</div>
+						<div class="justify-content-md-center row">
+							<div class="col-md-4">
+								<div class="card-title h5">
+									<?=$nflTeamID?> Score:
+								</div>
+							</div>
+							<div class="col-md-7">
+								<div class="card-title">
+									<?=$nflMyScore?>
+								</div>
+							</div>
+						</div>
+						<div class="justify-content-md-center row">
+							<div class="col-md-4">
+								<div class="card-title h5">
+									<?=$nflOppoID?> Score:
+								</div>
+							</div>
+							<div class="col-md-7">
+								<div class="card-title">
+									<?=$nflOppoScore?>
+								</div>
+							</div>
+						</div>
+						<?php } ?>
 					</div>
-					<div class="col-md-3">
-						<div class="card-title">
-						<?php if ($kickoff == "0") {
-							echo 'No game scheduled this week';
-						} elseif ($kickoff == "1") {
-							echo 'Your Team was Updated! Kickoff will display after next poll interval.';
-						} else {
-							$kickoff = new DateTime($kickoff, new DateTimeZone("UTC"));
-							$kickoff->setTimezone(new DateTimeZone(date_default_timezone_get()));
-							echo $kickoff->format("l, F j @ g:i A");
-							//echo date_format(date_create($kickoff), "l, F j @ g:i A e") . date_default_timezone_get();
-						} ?>
+					<div class="col-6">
+						<div  style= "height:100; width:100; margin:auto">
+							<img id="logoImage" src="<?echo $ncaaTeamLogo;?>" width="100" height ="100">
+						</div>	
+						<div class="justify-content-md-center row pt-4">
+							<div class="col-md-4">
+								<div class="card-title h5">
+									Kickoff:
+								</div>
+							</div>
+							<div class="col-md-7">
+								<div class="card-title">
+								<?php if ($ncaaKickoff == "0") {
+									echo 'No game scheduled this week';
+								} elseif ($ncaaKickoff == "1") {
+									echo 'Your Team was Updated! Kickoff will display after next poll interval.';
+								} else {
+									$ncaaKickoff = new DateTime($ncaaKickoff, new DateTimeZone("UTC"));
+									$ncaaKickoff->setTimezone(new DateTimeZone(date_default_timezone_get()));
+									echo $ncaaKickoff->format("l, F j @ g:i A");
+								} ?>
+								</div>
+							</div>
 						</div>
+						<?php if (!in_array($ncaaKickoff, array("0", "1"))) { ?>
+						<div class="justify-content-md-center row">
+							<div class="col-md-4">
+								<div class="card-title h5">
+									Opponent:
+								</div>
+							</div>
+							<div class="col-md-7">
+								<div class="card-title">
+									<?=$ncaaOppoName?>
+								</div>
+							</div>
+						</div>
+						<div class="justify-content-md-center row pt-5">
+							<div class="col-md-4">
+								<div class="card-title h5">
+									Game Status:
+								</div>
+							</div>
+							<div class="col-md-7">
+								<div class="card-title">
+									<?php if ($ncaaGameStatus == "pre") {
+										echo "Pregame";
+									} elseif ($ncaaGameStatus == "in") { 
+										echo "Playing";
+									} elseif ($ncaaGameStatus == "post") {
+										echo "Postgame";
+									} ?>
+								</div>
+							</div>
+						</div>
+						<div class="justify-content-md-center row">
+							<div class="col-md-4">
+								<div class="card-title h5">
+									<?=$ncaaTeamAbbreviation?> Score:
+								</div>
+							</div>
+							<div class="col-md-7">
+								<div class="card-title">
+									<?=$ncaaMyScore?>
+								</div>
+							</div>
+						</div>
+						<div class="justify-content-md-center row">
+							<div class="col-md-4">
+								<div class="card-title h5">
+									<?=$ncaaOppoID?> Score:
+								</div>
+							</div>
+							<div class="col-md-7">
+								<div class="card-title">
+									<?=$ncaaOppoScore?>
+								</div>
+							</div>
+						</div>
+						<?php } ?>
 					</div>
 				</div>
-				<?php if (!in_array($kickoff, array("0", "1"))) { ?>
-				<div class="justify-content-md-center row">
-					<div class="col-md-2">
-						<div class="card-title h5">
-							Opponent:
-						</div>
-					</div>
-					<div class="col-md-3">
-						<div class="card-title">
-							<?=$opponentName?>
-						</div>
-					</div>
-				</div>
-				<div class="justify-content-md-center row pt-5">
-					<div class="col-md-2">
-						<div class="card-title h5">
-							Game Status:
-						</div>
-					</div>
-					<div class="col-md-3">
-						<div class="card-title">
-							<?php if ($gameStatus == "pre") {
-								echo "Pregame";
-							} elseif ($gameStatus == "in") { 
-								echo "Playing";
-							} elseif ($gameStatus == "post") {
-								echo "Postgame";
-							} ?>
-						</div>
-					</div>
-				</div>
-				<div class="justify-content-md-center row">
-					<div class="col-md-2">
-						<div class="card-title h5">
-							<?=$teamID?> Score:
-						</div>
-					</div>
-					<div class="col-md-3">
-						<div class="card-title">
-							<?=$myScore?>
-						</div>
-					</div>
-				</div>
-				<div class="justify-content-md-center row">
-					<div class="col-md-2">
-						<div class="card-title h5">
-							<?=$opponentID?> Score:
-						</div>
-					</div>
-					<div class="col-md-3">
-						<div class="card-title">
-							<?=$theirScore?>
-						</div>
-					</div>
-				</div>
-				<?php } ?>
 			</div>
 		</div>
 	</div>
