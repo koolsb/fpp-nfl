@@ -9,52 +9,43 @@ if (file_exists($pluginConfigFile)) {
 foreach ($pluginSettings as $key => $value) { 
   ${$key} = urldecode($value);
 }
+
 //set defaults if nothing saved
-if (strlen(urldecode($pluginSettings['nflTeamID']))<1){
-  WriteSettingToFile("nflTeamID",urlencode(""),$pluginName);
+foreach (array('nfl', 'ncaa', 'nhl') as $league) {
+
+	if (strlen(urldecode($pluginSettings["{$league}TeamID"]))<1){
+		WriteSettingToFile("{$league}TeamID",urlencode(""),$pluginName);
+	}
+	if (strlen(urldecode($pluginSettings["{$league}TeamAbbreviation"]))<1){
+		WriteSettingToFile("{$league}TeamAbbreviation",urlencode(""),$pluginName);
+	}
+	if (strlen(urldecode($pluginSettings["{$league}TeamLogo"]))<1){
+		WriteSettingToFile("{$league}TeamLogo",urlencode(""),$pluginName);
+	}
+	if (strlen(urldecode($pluginSettings["{$league}Start"]))<1){
+		WriteSettingToFile("{$league}Start",urlencode("0"),$pluginName);
+	}
+	if (strlen(urldecode($pluginSettings["{$league}GameStatus"]))<1){
+		WriteSettingToFile("{$league}GameStatus",urlencode(""),$pluginName);
+	}
+	if (strlen(urldecode($pluginSettings["{$league}OppoID"]))<1){
+		WriteSettingToFile("{$league}OppoID",urlencode(""),$pluginName);
+	}
+	if (strlen(urldecode($pluginSettings["{$league}OppoName"]))<1){
+		WriteSettingToFile("{$league}OppoName",urlencode(""),$pluginName);
+	}	
+	if (strlen(urldecode($pluginSettings["{$league}WinSequence"]))<1){
+		WriteSettingToFile("{$league}WinSequence",urlencode(""),$pluginName);
+	}
+	if (strlen(urldecode($pluginSettings["{$league}MyScore"]))<1){
+		WriteSettingToFile("{$league}MyScore",urlencode("0"),$pluginName);
+	}
+	if (strlen(urldecode($pluginSettings["{$league}OppoScore"]))<1){
+		WriteSettingToFile("{$league}OppoScore",urlencode("0"),$pluginName);
+	}
+
 }
-if (strlen(urldecode($pluginSettings['nflKickoff']))<0){
-  WriteSettingToFile("nflKickoff",urlencode("1"),$pluginName);
-}
-if (strlen(urldecode($pluginSettings['nflMyScore']))<1){
-  WriteSettingToFile("nflMyScore",urlencode(""),$pluginName);
-}
-if (strlen(urldecode($pluginSettings['nflOppoScore']))<1){
-  WriteSettingToFile("nflOppoScore",urlencode(""),$pluginName);
-}
-if (strlen(urldecode($pluginSettings['nflTeamLogo']))<1){
-  WriteSettingToFile("nflTeamLogo",urlencode(""),$pluginName);
-}
-if (strlen(urldecode($pluginSettings['nflOppoID']))<1){
-  WriteSettingToFile("nflOppoID",urlencode(""),$pluginName);
-}
-if (strlen(urldecode($pluginSettings['nflOppoName']))<1){
-	WriteSettingToFile("nflOppoName",urlencode(""),$pluginName);
-}	
-if (strlen(urldecode($pluginSettings['ncaaTeamID']))<1){
-	WriteSettingToFile("ncaaTeamID",urlencode(""),$pluginName);
-}
-if (strlen(urldecode($pluginSettings['ncaaTeamAbbreviation']))<1){
-	WriteSettingToFile("ncaaTeamAbbreviation",urlencode(""),$pluginName);
-}
-if (strlen(urldecode($pluginSettings['ncaaKickoff']))<0){
-	WriteSettingToFile("ncaaKickoff",urlencode("1"),$pluginName);
-}
-if (strlen(urldecode($pluginSettings['ncaaMyScore']))<1){
-	WriteSettingToFile("ncaaMyScore",urlencode(""),$pluginName);
-}
-if (strlen(urldecode($pluginSettings['ncaaOppoScore']))<1){
-	WriteSettingToFile("ncaaOppoScore",urlencode(""),$pluginName);
-}
-if (strlen(urldecode($pluginSettings['ncaaTeamLogo']))<1){
-	WriteSettingToFile("ncaaTeamLogo",urlencode(""),$pluginName);
-}
-if (strlen(urldecode($pluginSettings['ncaaOppoID']))<1){
-	WriteSettingToFile("ncaaOppoID",urlencode(""),$pluginName);
-}
-if (strlen(urldecode($pluginSettings['ncaaOppoName']))<1){
-	WriteSettingToFile("ncaaOppoName",urlencode(""),$pluginName);
-}
+
 if (strlen(urldecode($pluginSettings['ENABLED']))<1){
   WriteSettingToFile("ENABLED",urlencode("OFF"),$pluginName);
 }
@@ -143,19 +134,19 @@ if ($pluginEnabled=="OFF"){
 							</div>
 							<div class="col-md-7">
 								<div class="card-title">
-								<?php if ($nflKickoff == "0") {
+								<?php if ($nflStart == "0") {
 									echo 'No game scheduled this week';
-								} elseif ($nflKickoff == "1") {
+								} elseif ($nflStart == "1") {
 									echo 'Your Team was Updated! Kickoff will display after next poll interval.';
 								} else {
-									$nflKickoff = new DateTime($nflKickoff, new DateTimeZone("UTC"));
-									$nflKickoff->setTimezone(new DateTimeZone(date_default_timezone_get()));
-									echo $nflKickoff->format("l, F j @ g:i A");
+									$nflStart = new DateTime($nflStart, new DateTimeZone("UTC"));
+									$nflStart->setTimezone(new DateTimeZone(date_default_timezone_get()));
+									echo $nflStart->format("l, F j @ g:i A");
 								} ?>
 								</div>
 							</div>
 						</div>
-						<?php if (!in_array($nflKickoff, array("0", "1"))) { ?>
+						<?php if (!in_array($nflStart, array("0", "1"))) { ?>
 						<div class="justify-content-md-center row">
 							<div class="col-md-4">
 								<div class="card-title h5">
@@ -189,7 +180,7 @@ if ($pluginEnabled=="OFF"){
 						<div class="justify-content-md-center row">
 							<div class="col-md-4">
 								<div class="card-title h5">
-									<?=$nflTeamID?> Score:
+									<?=$nflTeamAbbreviation?> Score:
 								</div>
 							</div>
 							<div class="col-md-7">
@@ -201,7 +192,7 @@ if ($pluginEnabled=="OFF"){
 						<div class="justify-content-md-center row">
 							<div class="col-md-4">
 								<div class="card-title h5">
-									<?=$nflOppoID?> Score:
+									<?=$nflOppoAbbreviation?> Score:
 								</div>
 							</div>
 							<div class="col-md-7">
@@ -224,19 +215,19 @@ if ($pluginEnabled=="OFF"){
 							</div>
 							<div class="col-md-7">
 								<div class="card-title">
-								<?php if ($ncaaKickoff == "0") {
+								<?php if ($ncaaStart == "0") {
 									echo 'No game scheduled this week';
-								} elseif ($ncaaKickoff == "1") {
+								} elseif ($ncaaStart == "1") {
 									echo 'Your Team was Updated! Kickoff will display after next poll interval.';
 								} else {
-									$ncaaKickoff = new DateTime($ncaaKickoff, new DateTimeZone("UTC"));
-									$ncaaKickoff->setTimezone(new DateTimeZone(date_default_timezone_get()));
-									echo $ncaaKickoff->format("l, F j @ g:i A");
+									$ncaaStart = new DateTime($ncaaStart, new DateTimeZone("UTC"));
+									$ncaaStart->setTimezone(new DateTimeZone(date_default_timezone_get()));
+									echo $ncaaStart->format("l, F j @ g:i A");
 								} ?>
 								</div>
 							</div>
 						</div>
-						<?php if (!in_array($ncaaKickoff, array("0", "1"))) { ?>
+						<?php if (!in_array($ncaaStart, array("0", "1"))) { ?>
 						<div class="justify-content-md-center row">
 							<div class="col-md-4">
 								<div class="card-title h5">
@@ -282,7 +273,7 @@ if ($pluginEnabled=="OFF"){
 						<div class="justify-content-md-center row">
 							<div class="col-md-4">
 								<div class="card-title h5">
-									<?=$ncaaOppoID?> Score:
+									<?=$ncaaOppoAbbreviation?> Score:
 								</div>
 							</div>
 							<div class="col-md-7">
