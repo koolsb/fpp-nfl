@@ -113,7 +113,7 @@ if ($pluginEnabled=="OFF"){
 		<div class="container-fluid">
 			<div class="card">											 
         		<!-- Status -->
-				<div class="justify-content-md-center row pt-4 pb-5">
+				<div class="justify-content-md-center row pt-4">
 					<div class="col-md-auto">
 						<h3>Game Status</h3>
 							<div style= "<?=$showDisabledDiv?>color:red;">
@@ -122,7 +122,8 @@ if ($pluginEnabled=="OFF"){
 					</div>          
 				</div>
 				<div class="justify-content-md-center row">
-					<div class="col-6">
+					<?php if ($nflTeamID != '') { ?>
+					<div class="col-6 py-5">
 						<div  style= "height:100; width:100; margin:auto">
 							<img id="logoImage" src="<?echo $nflTeamLogo;?>" width="100" height ="100">
 						</div>	
@@ -136,8 +137,6 @@ if ($pluginEnabled=="OFF"){
 								<div class="card-title">
 								<?php if ($nflStart == "0") {
 									echo 'No game scheduled this week';
-								} elseif ($nflStart == "1") {
-									echo 'Your Team was Updated! Kickoff will display after next poll interval.';
 								} else {
 									$nflStart = new DateTime($nflStart, new DateTimeZone("UTC"));
 									$nflStart->setTimezone(new DateTimeZone(date_default_timezone_get()));
@@ -203,7 +202,8 @@ if ($pluginEnabled=="OFF"){
 						</div>
 						<?php } ?>
 					</div>
-					<div class="col-6">
+					<?php } if ($ncaaTeamID != '') { ?>
+					<div class="col-6 py-5">
 						<div  style= "height:100; width:100; margin:auto">
 							<img id="logoImage" src="<?echo $ncaaTeamLogo;?>" width="100" height ="100">
 						</div>	
@@ -217,8 +217,6 @@ if ($pluginEnabled=="OFF"){
 								<div class="card-title">
 								<?php if ($ncaaStart == "0") {
 									echo 'No game scheduled this week';
-								} elseif ($ncaaStart == "1") {
-									echo 'Your Team was Updated! Kickoff will display after next poll interval.';
 								} else {
 									$ncaaStart = new DateTime($ncaaStart, new DateTimeZone("UTC"));
 									$ncaaStart->setTimezone(new DateTimeZone(date_default_timezone_get()));
@@ -284,6 +282,167 @@ if ($pluginEnabled=="OFF"){
 						</div>
 						<?php } ?>
 					</div>
+					<?php } if ($nhlTeamID != '') { ?>
+					<div class="col-6 py-5">
+						<div  style= "height:100; width:100; margin:auto">
+							<img id="logoImage" src="<?echo $nhlTeamLogo;?>" width="100" height ="100">
+						</div>	
+						<div class="justify-content-md-center row pt-4">
+							<div class="col-md-4">
+								<div class="card-title h5">
+									Puck Drop:
+								</div>
+							</div>
+							<div class="col-md-7">
+								<div class="card-title">
+								<?php if ($nhlStart == "0") {
+									echo 'No game scheduled this week';
+								} else {
+									$nhlStart = new DateTime($nhlStart, new DateTimeZone("UTC"));
+									$nhlStart->setTimezone(new DateTimeZone(date_default_timezone_get()));
+									echo $nhlStart->format("l, F j @ g:i A");
+								} ?>
+								</div>
+							</div>
+						</div>
+						<?php if (!in_array($nhlStart, array("0", "1"))) { ?>
+						<div class="justify-content-md-center row">
+							<div class="col-md-4">
+								<div class="card-title h5">
+									Opponent:
+								</div>
+							</div>
+							<div class="col-md-7">
+								<div class="card-title">
+									<?=$nhlOppoName?>
+								</div>
+							</div>
+						</div>
+						<div class="justify-content-md-center row pt-5">
+							<div class="col-md-4">
+								<div class="card-title h5">
+									Game Status:
+								</div>
+							</div>
+							<div class="col-md-7">
+								<div class="card-title">
+									<?php if ($nhlGameStatus == "pre") {
+										echo "Pregame";
+									} elseif ($nhlGameStatus == "in") { 
+										echo "Playing";
+									} elseif ($nhlGameStatus == "post") {
+										echo "Postgame";
+									} ?>
+								</div>
+							</div>
+						</div>
+						<div class="justify-content-md-center row">
+							<div class="col-md-4">
+								<div class="card-title h5">
+									<?=$nhlTeamAbbreviation?> Score:
+								</div>
+							</div>
+							<div class="col-md-7">
+								<div class="card-title">
+									<?=$nhlMyScore?>
+								</div>
+							</div>
+						</div>
+						<div class="justify-content-md-center row">
+							<div class="col-md-4">
+								<div class="card-title h5">
+									<?=$nhlOppoAbbreviation?> Score:
+								</div>
+							</div>
+							<div class="col-md-7">
+								<div class="card-title">
+									<?=$nhlOppoScore?>
+								</div>
+							</div>
+						</div>
+						<?php } ?>
+					</div>
+					<?php } if ($mlbTeamID != '') { ?>
+					<div class="col-6 py-5">
+						<div  style= "height:100; width:100; margin:auto">
+							<img id="logoImage" src="<?echo $mlbTeamLogo;?>" width="100" height ="100">
+						</div>	
+						<div class="justify-content-md-center row pt-4">
+							<div class="col-md-4">
+								<div class="card-title h5">
+									First Pitch:
+								</div>
+							</div>
+							<div class="col-md-7">
+								<div class="card-title">
+								<?php if ($mlbStart == "0") {
+									echo 'No game scheduled this week';
+								} else {
+									$mlbStart = new DateTime($mlbStart, new DateTimeZone("UTC"));
+									$mlbStart->setTimezone(new DateTimeZone(date_default_timezone_get()));
+									echo $mlbStart->format("l, F j @ g:i A");
+								} ?>
+								</div>
+							</div>
+						</div>
+						<?php if (!in_array($mlbStart, array("0", "1"))) { ?>
+						<div class="justify-content-md-center row">
+							<div class="col-md-4">
+								<div class="card-title h5">
+									Opponent:
+								</div>
+							</div>
+							<div class="col-md-7">
+								<div class="card-title">
+									<?=$mlbOppoName?>
+								</div>
+							</div>
+						</div>
+						<div class="justify-content-md-center row pt-5">
+							<div class="col-md-4">
+								<div class="card-title h5">
+									Game Status:
+								</div>
+							</div>
+							<div class="col-md-7">
+								<div class="card-title">
+									<?php if ($mlbGameStatus == "pre") {
+										echo "Pregame";
+									} elseif ($mlbGameStatus == "in") { 
+										echo "Playing";
+									} elseif ($mlbGameStatus == "post") {
+										echo "Postgame";
+									} ?>
+								</div>
+							</div>
+						</div>
+						<div class="justify-content-md-center row">
+							<div class="col-md-4">
+								<div class="card-title h5">
+									<?=$mlbTeamAbbreviation?> Score:
+								</div>
+							</div>
+							<div class="col-md-7">
+								<div class="card-title">
+									<?=$mlbMyScore?>
+								</div>
+							</div>
+						</div>
+						<div class="justify-content-md-center row">
+							<div class="col-md-4">
+								<div class="card-title h5">
+									<?=$mlbOppoAbbreviation?> Score:
+								</div>
+							</div>
+							<div class="col-md-7">
+								<div class="card-title">
+									<?=$mlbOppoScore?>
+								</div>
+							</div>
+						</div>
+						<?php } ?>
+					</div>
+					<?php } ?>
 				</div>
 			</div>
 		</div>
