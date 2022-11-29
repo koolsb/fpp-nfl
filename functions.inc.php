@@ -256,7 +256,9 @@ function updateTeamStatus($reparseSettings=true){
 
 	//cycle through each league
 	foreach ($activeLeagues as $league) {
-		logEntry("Parsing league {$league}");	
+		if ($logLevel >= 5) {
+			logEntry("Parsing league {$league}");	
+		}
  
 		if (strlen(urldecode($pluginSettings["{$league}GameStatus"]))>1){
 			${$league . "GameStatus"}=urldecode($pluginSettings["{$league}GameStatus"]);
@@ -328,7 +330,9 @@ function updateTeamStatus($reparseSettings=true){
 		//run game checks based on prior game status
 		switch (${$league . "GameStatus"}) {
 			case "pre":
-
+				if ($logLevel >= 5) {
+					logEntry("{$league} Game Status is Pre");	
+				}
 				$now = new DateTime();
 				$gameDate = new DateTime(${$league . "Start"});
 				$timeToGame = $gameDate->getTimestamp() - $now->getTimestamp();
@@ -339,12 +343,15 @@ function updateTeamStatus($reparseSettings=true){
 				break;
 
 			case "post":
-
+				if ($logLevel >= 5) {
+					logEntry("{$league} Game Status is Post");	
+				}
 				//check for next game
 				$newInfo = getTeamInfo($sport, $league, ${$league . "TeamID"});
 				if ($newInfo['nextEventID'] != ${$league . "TeamNextEventID"}) {
 					WriteSettingToFile("{$league}TeamNextEventID",$newInfo['nextEventID'],$pluginName);
 					WriteSettingToFile("{$league}Start",$newInfo['nextEventDate'],$pluginName);
+					WriteSettingToFile("{$league}GameStatus","",$pluginName);
 					logEntry("{$league} Next game updated " . $newInfo['nextEventDate']);
 					//clear old scores
 					WriteSettingToFile("{$league}MyScore",0,$pluginName);
@@ -360,8 +367,7 @@ function updateTeamStatus($reparseSettings=true){
 
 				//log polling
 				if ($logLevel >= 5) {
-					logEntry("Polling ESPN {$league} API");
-					echo "Polling ESPN {$league} API";
+					logEntry("{$league} Game Status is In or Not Set. Polling ESPN API");	
 				}
 
 				//get game status
@@ -369,6 +375,9 @@ function updateTeamStatus($reparseSettings=true){
 
 				// set opponent ID
 				if ($nflOppoID != $status['oppoID']) {
+					if ($logLevel >= 5) {
+						logEntry("{$league} Opponent Updated");	
+					}
 					WriteSettingToFile("{$league}OppoID",$status['oppoID'],$pluginName);
 					WriteSettingToFile("{$league}OppoName",$status['oppoName'],$pluginName);
 					WriteSettingToFile("{$league}OppoAbbreviation",$status['oppoAbbreviation'],$pluginName);
@@ -419,13 +428,19 @@ function updateTeamStatus($reparseSettings=true){
 
 				//update sleep timer
 				switch ($status['state']){
-					case "in":						
+					case "in":
+						if ($logLevel >= 5) {
+							logEntry("{$league} Game Status updating to in");	
+						}					
 						${$league . "SleepTime"} = 5;
 						if (${$league . "GameStatus"} != "in") {
 							WriteSettingToFile("{$league}GameStatus",$status['state'],$pluginName);
 						}
 						break;
 					case "post":
+						if ($logLevel >= 5) {
+							logEntry("{$league} Game Status updating to post");	
+						}
 						if ($status['myScore'] > $status['oppoScore']) {
 							if (${$league . "WinSequence"} != '') {
 								insertPlaylistImmediate(${$league . "WinSequence"});
@@ -438,6 +453,9 @@ function updateTeamStatus($reparseSettings=true){
 						${$league . "SleepTime"} = 600;
 						break;
 					default:
+						if ($logLevel >= 5) {
+							logEntry("{$league} Game Status updating to {$status['state']}");	
+						}
 						WriteSettingToFile("{$league}GameStatus",$status['state'],$pluginName);
 						${$league . "SleepTime"} = 600;					
 				}
