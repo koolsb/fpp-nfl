@@ -9,53 +9,6 @@ if (file_exists($pluginConfigFile)) {
   $pluginSettings = parse_ini_file($pluginConfigFile);
 }
 
-//set defaults if nothing saved
-foreach (array('nfl', 'ncaa', 'nhl', 'mlb') as $league) {
-
-  if (strlen(urldecode($pluginSettings["{$league}TeamID"]))<1){
-    WriteSettingToFile("{$league}TeamID",urlencode(""),$pluginName);
-  }
-  if (strlen(urldecode($pluginSettings["{$league}TeamLogo"]))<1){
-    WriteSettingToFile("{$league}TeamLogo",urlencode(""),$pluginName);
-  }
-  if (strlen(urldecode($pluginSettings["{$league}Start"]))<1){
-    WriteSettingToFile("{$league}Start",urlencode("0"),$pluginName);
-  }
-  if (strlen(urldecode($pluginSettings["{$league}GameStatus"]))<1){
-    WriteSettingToFile("{$league}GameStatus",urlencode(""),$pluginName);
-  }
-  if (strlen(urldecode($pluginSettings["{$league}OppoID"]))<1){
-    WriteSettingToFile("{$league}OppoID",urlencode(""),$pluginName);
-  }
-  if (strlen(urldecode($pluginSettings["{$league}WinSequence"]))<1){
-    WriteSettingToFile("{$league}WinSequence",urlencode(""),$pluginName);
-  }
-
-  if ($league == "nfl" || $league == "ncaa") {
-
-    if (strlen(urldecode($pluginSettings["${league}TouchdownSequence"]))<1){
-      WriteSettingToFile("${league}TouchdownSequence",urlencode(""),$pluginName);
-    }
-    if (strlen(urldecode($pluginSettings["${league}FieldgoalSequence"]))<1){
-      WriteSettingToFile("${league}FieldgoalSequence",urlencode(""),$pluginName);
-    }
-
-  } elseif ($league == "nhl" || $league == "mlb") {
-
-    if (strlen(urldecode($pluginSettings["{$league}ScoreSequence"]))<1){
-      WriteSettingToFile("{$league}ScoreSequence",urlencode(""),$pluginName);
-    }
-
-  }
-
-}
-
-if (strlen(urldecode($pluginSettings['logLevel']))<1){
-  WriteSettingToFile("logLevel",urlencode("4"),$pluginName);
-}
-
-$pluginSettings = parse_ini_file($pluginConfigFile);
-
 foreach ($pluginSettings as $key => $value) { 
   ${$key} = urldecode($value);
 }

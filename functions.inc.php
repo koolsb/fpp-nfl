@@ -202,7 +202,7 @@ function getGameStatus($sport, $league, $gameID, $teamID) {
 
 }
 
-function updateTeamStatus($reparseSettings=false){
+function updateTeamStatus($reparseSettings=true){
 	//initialize globals
 	global $logFile;	
 	global $pluginConfigFile;
@@ -273,17 +273,17 @@ function updateTeamStatus($reparseSettings=false){
 		} else {
 			${$league . "Start"}="";
 		}
-		if (strlen(urldecode($pluginSettings["{$league}MyScore"]))>1){
+		if (strlen(urldecode($pluginSettings["{$league}MyScore"]))>0){
 			${$league . "MyScore"}=urldecode($pluginSettings["{$league}MyScore"]);
 		} else {
 			${$league . "MyScore"}="0";
 		}
-		if (strlen(urldecode($pluginSettings["{$league}OppoScore"]))>1){
+		if (strlen(urldecode($pluginSettings["{$league}OppoScore"]))>0){
 			${$league . "OppoScore"}=urldecode($pluginSettings["{$league}OppoScore"]);
 		} else {
 			${$league . "OppoScore"}="0";
 		}
-		if (strlen(urldecode($pluginSettings["{$league}OppoID"]))>1){
+		if (strlen(urldecode($pluginSettings["{$league}OppoID"]))>0){
 			${$league . "OppoID"}=urldecode($pluginSettings["{$league}OppoID"]);
 		} else {
 			${$league . "OppoID"}="";
@@ -379,7 +379,7 @@ function updateTeamStatus($reparseSettings=false){
 
 					if (${$league . "MyScore"} + 6 == $status['myScore']) {
 						//play touchdown sequence if set
-						if (${$league . "TouchdownSequence"} != 'none') {
+						if (${$league . "TouchdownSequence"} != '') {
 							insertPlaylistImmediate(${$league . "TouchdownSequence"});
 							logEntry("{$league} Touchdown! Playing sequence.");					
 						} else {
@@ -387,7 +387,7 @@ function updateTeamStatus($reparseSettings=false){
 						}
 					} elseif (${$league . "MyScore"} + 3 == $status['myScore']) {
 						//play fieldgoal sequence if set
-						if (${$league . "FieldgoalSequence"} != 'none') {
+						if (${$league . "FieldgoalSequence"} != '') {
 							insertPlaylistImmediate(${$league . "FieldgoalSequence"});
 							logEntry("{$league} Fieldgoal! Playing sequence.");					
 						} else {
@@ -396,10 +396,9 @@ function updateTeamStatus($reparseSettings=false){
 					}
 
 				} elseif ($sport == "hockey" || $sport == "baseball") {
-					
 					if (${$league . "MyScore"} < $status['myScore']) {
 						//play score sequence if set
-						if (${$league . "ScoreSequence"} != 'none') {
+						if (${$league . "ScoreSequence"} != '') {
 							insertPlaylistImmediate(${$league . "ScoreSequence"});
 							logEntry("{$league} Score! Playing sequence.");					
 						} else {
@@ -411,9 +410,11 @@ function updateTeamStatus($reparseSettings=false){
 				//update stored scores
 				if (${$league . "MyScore"} != $status['myScore']) {
 					WriteSettingToFile("{$league}MyScore",$status['myScore'],$pluginName);
+					logEntry("Updating {$league} MyScore to " . $status['myScore']);
 				}
 				if (${$league . "OppoScore"} != $status['oppoScore']) {
 					WriteSettingToFile("{$league}OppoScore",$status['oppoScore'],$pluginName);
+					logEntry("Updating {$league} OppoScore to " . $status['oppoScore']);
 				}
 
 				//update sleep timer
@@ -426,7 +427,7 @@ function updateTeamStatus($reparseSettings=false){
 						break;
 					case "post":
 						if ($status['myScore'] > $status['oppoScore']) {
-							if (${$league . "WinSequence"} != 'none') {
+							if (${$league . "WinSequence"} != '') {
 								insertPlaylistImmediate(${$league . "WinSequence"});
 								logEntry("Your {$league} team won! Playing sequence.");								
 							} else {
