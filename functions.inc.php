@@ -337,7 +337,16 @@ function updateTeamStatus($reparseSettings=true){
 				$gameDate = new DateTime(${$league . "Start"});
 				$timeToGame = $gameDate->getTimestamp() - $now->getTimestamp();
 				if ($timeToGame < 1200) {
+					if ($logLevel >= 5) {
+						logEntry("{$league} Game is 20 min or less from gametime");	
+					}
 					${$league . "SleepTime"} = 30;
+					//check game status
+					$status = getGameStatus($sport, $league, ${$league . "TeamNextEventID"}, ${$league . "TeamID"});
+					if ($status['state'] == "in") {
+						logEntry("{$league} game is now playing.");
+						WriteSettingToFile("{$league}GameStatus",$status['state'],$pluginName);
+					}
 				}
 
 				break;
