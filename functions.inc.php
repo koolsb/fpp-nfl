@@ -383,9 +383,9 @@ function updateTeamStatus($reparseSettings=true){
 				$status = getGameStatus($sport, $league, ${$league . "TeamNextEventID"}, ${$league . "TeamID"});
 
 				// set opponent ID
-				if ($nflOppoID != $status['oppoID']) {
+				if (${$league . "OppoID"} != $status['oppoID']) {
 					if ($logLevel >= 5) {
-						logEntry("{$league} Opponent Updated");	
+						logEntry("{$league} Opponent Updated to " . ${$league . "OppoID"} . " from {$status['oppoID']}");	
 					}
 					WriteSettingToFile("{$league}OppoID",$status['oppoID'],$pluginName);
 					WriteSettingToFile("{$league}OppoName",$status['oppoName'],$pluginName);
@@ -438,12 +438,13 @@ function updateTeamStatus($reparseSettings=true){
 				//update sleep timer
 				switch ($status['state']){
 					case "in":
-						if ($logLevel >= 5) {
-							logEntry("{$league} Game Status updating to in");	
-						}					
+										
 						${$league . "SleepTime"} = 5;
 						if (${$league . "GameStatus"} != "in") {
 							WriteSettingToFile("{$league}GameStatus",$status['state'],$pluginName);
+							if ($logLevel >= 5) {
+								logEntry("{$league} Game Status updating to in");	
+							}	
 						}
 						break;
 					case "post":
