@@ -1,8 +1,8 @@
 {
 	"repoName": "fpp-nfl",
-	"name": "NFL/NCAA Touchdown",
+	"name": "Pro Sports Scoring Plugin",
 	"author": "Ben Kools (koolsb)",
-	"description": "Automatically play a celebratory sequence when your NFL or NCAA team scores or wins!",
+	"description": "Automatically play a celebratory sequence when your NFL, NHL, MLB or NCAA Football team scores or wins!",
 	"homeURL": "https://github.com/koolsb/fpp-nfl",
 	"srcURL": "https://github.com/koolsb/fpp-nfl.git",
 	"bugURL": "https://github.com/koolsb/fpp-nfl/issues",

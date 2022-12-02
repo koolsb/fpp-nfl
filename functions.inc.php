@@ -16,17 +16,21 @@ if (file_exists($pluginConfigFile)) {
 if(isset($_POST['action']) && !empty($_POST['action'])) {
     $action = $_POST['action'];
     switch($action) {
-        case 'getNFLLogo' : updateTeam();
+        case 'updateNFLTeam' : updateTeam("football", "nfl");
 			break;
-		case 'getNCAALogo' : updateTeam("ncaa");
+		case 'updateNCAATeam' : updateTeam("football", "ncaa");
+			break;
+		case 'updateNHLTeam' : updateTeam("hockey", "nhl");
+			break;
+		case 'updateMLBTeam' : updateTeam("baseball", "mlb");
 			break;
         case 'blah' : blah();
 			break;        
     }
 }
 
-function getNFLTeams(){
-	$url = "http://site.api.espn.com/apis/site/v2/sports/football/nfl/teams";
+function getTeams($sport='football', $league='nfl'){
+	$url = "http://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/teams";
 	$options = array(
 	'http' => array(
 		'method'  => 'GET',
@@ -36,9 +40,10 @@ function getNFLTeams(){
 	$result = file_get_contents( $url, false, $context );
 	$result = json_decode($result, true);
 	$teams = $result['sports']['0']['leagues']['0']['teams'];
+	$teamNames["No team"]="";
 	foreach ($teams as $team) {
 		$team = $team['team'];
-        $teamNames[$team['displayName']] = $team['abbreviation'];		
+        $teamNames[$team['displayName']] = $team['id'];		
 	}	
 	return $teamNames;
 }
@@ -69,6 +74,7 @@ function getNCAATeams(){
 		}	
 	}
 	ksort($teamNames);
+	$teamNames = array('No team' => "") + $teamNames;
 	return $teamNames;
 }
 
@@ -82,18 +88,18 @@ function getSequences(){
 	$context = stream_context_create( $options );
 	$result = file_get_contents( $url, false, $context );
 	$sequences = json_decode($result, true);
-	$sequenceList["No Sequence"]="none";
+	$sequenceList["No Sequence"]="";
 	foreach ($sequences as $sequence) {		
         $sequenceList[$sequence]=$sequence;		
 	}		
 	return $sequenceList;
 }
 
-function getTeamInfo($team, $league="nfl"){
+function getTeamInfo($sport, $league, $team){
 	if ($league == "ncaa") {
 		$league = "college-football";
 	}
-	$url = "http://site.api.espn.com/apis/site/v2/sports/football/{$league}/teams/{$team}";
+	$url = "http://site.api.espn.com/apis/site/v2/sports/{$sport}/{$league}/teams/{$team}";
 	$options = array(
   		'http' => array(
     		'method'  => 'GET',
@@ -105,12 +111,15 @@ function getTeamInfo($team, $league="nfl"){
 
 	$teamInfo["logo"] = $result['team']['logos'][0]['href'];
 	$teamInfo["abbreviation"] = $result['team']['abbreviation'];
-	$teamInfo["groupID"] = $result['team']['groups']['id'];
+	$teamInfo["name"] = $result['team']['displayName'];
+	$teamInfo["nextEventID"] = $result['team']['nextEvent'][0]['id'];
+	$teamInfo["nextEventDate"] = $result['team']['nextEvent'][0]['date'];
+	$teamInfo["nextEventStatus"] = $result['team']['nextEvent'][0]['competitions'][0]['status']['type']['state'];
 	return $teamInfo;
 
 }
 
-function updateTeam($league="nfl"){
+function updateTeam($sport, $league){
 	logEntry("Updating {$league} Team and logo");
 	global $pluginName;
 	global $pluginSettings;
@@ -120,27 +129,80 @@ function updateTeam($league="nfl"){
 	WriteSettingToFile("{$league}OppoScore",0,$pluginName);
 
 	//configure variables
-	if (strlen(urldecode($pluginSettings["{$league}TeamID"]))>1){
+	if (strlen(urldecode($pluginSettings["{$league}TeamID"]))>0){
 		$teamID=urldecode($pluginSettings["{$league}TeamID"]);
-		$teamInfo = getTeamInfo($teamID, $league);
+		$teamInfo = getTeamInfo($sport, $league, $teamID);
 		$teamLogo = $teamInfo['logo'];
-		$teamGroupID = $teamInfo['groupID'];
 		$teamAbbreviation = $teamInfo['abbreviation'];
+		$teamName = $teamInfo['name'];
+		$teamNextEventID = $teamInfo['nextEventID'];
+		$teamNextEventDate = $teamInfo['nextEventDate'];
 	}else{
 		$teamLogo = "";
+		$teamAbbreviation = "";
+		$teamName = "";
+		$teamNextEventID = "";
+		$teamNextEventDate = "";
 	}
 	WriteSettingToFile("{$league}TeamLogo",$teamLogo,$pluginName);
-	WriteSettingToFile("{$league}TeamGroupID",$teamGroupID,$pluginName);
 	WriteSettingToFile("{$league}TeamAbbreviation",$teamAbbreviation,$pluginName);
-	logEntry("{$league} Team Group ID Updated " . $teamGroupID);
+	WriteSettingToFile("{$league}TeamName",$teamName,$pluginName);
+	WriteSettingToFile("{$league}TeamNextEventID",$teamNextEventID,$pluginName);
+	WriteSettingToFile("{$league}Start",$teamNextEventDate,$pluginName);
+	WriteSettingToFile("{$league}GameStatus","",$pluginName);
+
 	logEntry("{$league} Logo updated " . $teamLogo);
 	logEntry("{$league} Abbreviation updated " . $teamAbbreviation);
+	logEntry("{$league} Name updated " . $teamName);
+	logEntry("{$league} Next game updated " . $teamNextEventDate);
 	updateTeamStatus(true);
 	return $teamLogo;
 
 }
 
-function updateTeamStatus($reparseSettings=false){
+function getGameStatus($sport, $league, $gameID, $teamID) {
+	if ($league == "ncaa") {
+		$league = "college-football";
+	}
+
+	$url = "http://site.api.espn.com/apis/site/v2/sports/{$sport}/{$league}/scoreboard/{$gameID}";
+	$options = array(
+	'http' => array(
+		'method'  => 'GET',
+		)
+	);
+	
+	$context = stream_context_create( $options );
+	$game = file_get_contents( $url, false, $context );
+	$game = json_decode($game, true);
+
+	//get game info
+	$gameStatus['start'] = $game['date'];
+	$gameStatus['state'] = $game['status']['type']['state'];
+
+	//check opponent ID
+	if ($game['competitions'][0]['competitors'][0]['team']['id'] == $teamID) {
+		$teamIndex = 0;
+		$oppoIndex = 1;
+	} else {
+		$teamIndex = 1;
+		$oppoIndex = 0;
+	}
+
+	//get competitor info
+	$gameStatus['oppoID'] = $game['competitions'][0]['competitors'][$oppoIndex]['team']['id'];
+	$gameStatus['oppoAbbreviation'] = $game['competitions'][0]['competitors'][$oppoIndex]['team']['abbreviation'];
+	$gameStatus['oppoName'] = $game['competitions'][0]['competitors'][$oppoIndex]['team']['displayName'];
+
+	//get score
+	$gameStatus['myScore'] = $game['competitions'][0]['competitors'][$teamIndex]['score'];
+	$gameStatus['oppoScore'] = $game['competitions'][0]['competitors'][$oppoIndex]['score'];
+
+	return $gameStatus;
+
+}
+
+function updateTeamStatus($reparseSettings=true){
 	//initialize globals
 	global $logFile;	
 	global $pluginConfigFile;
@@ -149,6 +211,7 @@ function updateTeamStatus($reparseSettings=false){
 
 	//reparse settings file - needs to reread team group id on change
 	if ($reparseSettings) {
+		logEntry("Reparsing config file");
 		if (file_exists($pluginConfigFile)) {
 			$pluginSettings = parse_ini_file ($pluginConfigFile);
 		  } else {	
@@ -156,377 +219,262 @@ function updateTeamStatus($reparseSettings=false){
 			  logEntry("No pluginConfigFile");
 		  }
 	}
-	
-	//get settings
-	if (strlen(urldecode($pluginSettings['nflTeamID']))>1){
-		$nflTeamID=urldecode($pluginSettings['nflTeamID']);
-	} else {
-		$nflTeamID="";
-	}
-	if (strlen(urldecode($pluginSettings['nflTouchdownSequence']))>1){
-		$nflTouchdownSequence=urldecode($pluginSettings['nflTouchdownSequence']);
-	} else {
-		$nflTouchdownSequence="none";
-	}
-	if (strlen(urldecode($pluginSettings['nflFieldgoalSequence']))>1){
-		$nflFieldgoalSequence=urldecode($pluginSettings['nflFieldgoalSequence']);
-	} else {
-		$nflFieldgoalSequence="none";
-	}
-	if (strlen(urldecode($pluginSettings['nflWinSequence']))>1){
-		$nflWinSequence=urldecode($pluginSettings['nflWinSequence']);
-	} else {
-		$nflWinSequence="none";
-	}
-	if (strlen(urldecode($pluginSettings['nflOppoID']))>1){		
-		$nflOppoID=urldecode($pluginSettings['nflOppoID']);
-	}else{		
-		$nflOppoID="";
-	}
-	if (strlen(urldecode($pluginSettings['nflKickoff']))>1){
-		$nflKickoff=urldecode($pluginSettings['nflKickoff']);
-	}else{
-		$nflKickoff="";
-	}
-	if (strlen(urldecode($pluginSettings['nflGameStatus']))>1){
-		$nflGameStatus=urldecode($pluginSettings['nflGameStatus']);
-	}else{
-		$nflGameStatus="";
-	}
-	if (strlen(urldecode($pluginSettings['nflMyScore']))>0){
-		$nflMyScore=urldecode($pluginSettings['nflMyScore']);
-	}else{
-		$nflMyScore="0";
-	}
-	if (strlen(urldecode($pluginSettings['nflOppoScore']))>0){
-		$nflOppoScore=urldecode($pluginSettings['nflOppoScore']);
-	}else{
-		$nflOppoScore="0";
-	}
 
-	if (strlen(urldecode($pluginSettings['ncaaTeamID']))>1){
-		$ncaaTeamID=urldecode($pluginSettings['ncaaTeamID']);
-	} else {
-		$ncaaTeamID="";
-	}
-	if (strlen(urldecode($pluginSettings['ncaaTeamAbbreviation']))>1){
-		$ncaaTeamAbbreviation=urldecode($pluginSettings['ncaaTeamAbbreviation']);
-	} else {
-		$ncaaTeamAbbreviation="";
-	}
-	if (strlen(urldecode($pluginSettings['ncaaTeamGroupID']))>1){
-		$ncaaTeamGroupID=urldecode($pluginSettings['ncaaTeamGroupID']);
-	} else {
-		$ncaaTeamGroupID="";
-	}
-	if (strlen(urldecode($pluginSettings['ncaaTouchdownSequence']))>1){
-		$ncaaTouchdownSequence=urldecode($pluginSettings['ncaaTouchdownSequence']);
-	} else {
-		$ncaaTouchdownSequence="none";
-	}
-	if (strlen(urldecode($pluginSettings['ncaaFieldgoalSequence']))>1){
-		$ncaaFieldgoalSequence=urldecode($pluginSettings['ncaaFieldgoalSequence']);
-	} else {
-		$ncaaFieldgoalSequence="none";
-	}
-	if (strlen(urldecode($pluginSettings['ncaaWinSequence']))>1){
-		$ncaaWinSequence=urldecode($pluginSettings['ncaaWinSequence']);
-	} else {
-		$ncaaWinSequence="none";
-	}
-	if (strlen(urldecode($pluginSettings['ncaaOppoID']))>1){		
-		$ncaaOppoID=urldecode($pluginSettings['ncaaOppoID']);
-	}else{		
-		$ncaaOppoID="";
-	}
-	if (strlen(urldecode($pluginSettings['ncaaKickoff']))>1){
-		$ncaaKickoff=urldecode($pluginSettings['ncaaKickoff']);
-	}else{
-		$ncaaKickoff="";
-	}
-	if (strlen(urldecode($pluginSettings['ncaaGameStatus']))>1){
-		$ncaaGameStatus=urldecode($pluginSettings['ncaaGameStatus']);
-	}else{
-		$ncaaGameStatus="";
-	}
-	if (strlen(urldecode($pluginSettings['ncaaMyScore']))>0){
-		$ncaaMyScore=urldecode($pluginSettings['ncaaMyScore']);
-	}else{
-		$ncaaMyScore="0";
-	}
-	if (strlen(urldecode($pluginSettings['ncaaOppoScore']))>0){
-		$ncaaOppoScore=urldecode($pluginSettings['ncaaOppoScore']);
-	}else{
-		$ncaaOppoScore="0";
-	}
-
+	//setup log level
 	if (strlen(urldecode($pluginSettings['logLevel']))>0){
 		$logLevel=urldecode($pluginSettings['logLevel']);
 	}else{
 		$logLevel=0;
 	}
-		
-	$nflSleepTime = 600; 
-	$ncaaSleepTime = 600;
 	
+	//get active leagues
+	foreach (array('nfl', 'ncaa', 'nhl', 'mlb') as $league) {
+
+		if (strlen(urldecode($pluginSettings["{$league}TeamID"]))>0){
+			${$league . "TeamID"}=urldecode($pluginSettings["{$league}TeamID"]);
+		} else {
+			${$league . "TeamID"}="";
+		}
+
+		//initialize sleep times
+		${$league . "SleepTime"} = 600;
+
+	}
+	$activeLeagues = array();
 	if ($nflTeamID != '') {
-		
-		//log polling
-		if ($logLevel >= 5) {
-			logEntry("Polling ESPN NFL API");
-			echo "Polling ESPN NFL API";
-		}
-		
-		//get NFL score
-		$url = "http://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard";
-		$options = array(
-		'http' => array(
-			'method'  => 'GET',
-			)
-		);
-		
-		$context = stream_context_create( $options );
-		$games = file_get_contents( $url, false, $context );
-		$games = json_decode($games, true);
-		$games = $games['events'];
-
-		$gameFound = false;
-
-		foreach($games as $game) {
-			if (strpos($game['shortName'], $nflTeamID) !== false) {
-				$gameFound = true;
-
-				// set kickoff time
-				WriteSettingToFile("nflKickoff",$game['date'],$pluginName);				
-
-				if ($game['competitions'][0]['competitors'][0]['team']['abbreviation'] == $nflTeamID) {
-					$nflTeamIndex = 0;
-					$nflOppoIndex = 1;
-				} else {
-					$nflTeamIndex = 1;
-					$nflOppoIndex = 0;
-				}
-
-				// set opponent ID
-				if ($nflOppoID != $game['competitions'][0]['competitors'][$nflOppoIndex]['team']['abbreviation']) {
-					WriteSettingToFile("nflOppoID",$game['competitions'][0]['competitors'][$nflOppoIndex]['team']['abbreviation'],$pluginName);
-					WriteSettingToFile("nflOppoName",$game['competitions'][0]['competitors'][$nflOppoIndex]['team']['displayName'],$pluginName);
-				}
-			
-				//get current scores
-				$nflNewTeamScore = $game['competitions'][0]['competitors'][$nflTeamIndex]['score'];
-				$nflNewOppoScore = $game['competitions'][0]['competitors'][$nflOppoIndex]['score'];
-			
-				//check score changes
-				if ($nflMyScore + 6 == $nflNewTeamScore) {
-					//play touchdown sequence if set
-					if ($nflTouchdownSequence != 'none') {
-						insertPlaylistImmediate($nflTouchdownSequence);
-						logEntry("NFL Touchdown! Playing sequence.");					
-					} else {
-						logEntry("NFL Touchdown Triggered but no sequence selected");
-					}
-				} elseif ($nflMyScore + 3 == $nflNewTeamScore) {
-					//play fieldgoal sequence if set
-					if ($nflFieldgoalSequence != 'none') {
-						insertPlaylistImmediate($nflFieldgoalSequence);
-						logEntry("NFL Fieldgoal! Playing sequence.");					
-					} else {
-						logEntry("NFL Fieldgoal Triggered but no sequence selected");
-					}
-				}
-			
-				//update stored scores
-				if ($nflMyScore != $nflNewTeamScore) {
-					WriteSettingToFile("nflMyScore",$nflNewTeamScore,$pluginName);
-				}
-				if ($nflOppoScore != $nflNewOppoScore) {
-					WriteSettingToFile("nflOppoScore",$nflNewOppoScore,$pluginName);
-				}
-
-				//update sleep timer
-				switch ($game['status']['type']['state']){
-					case "pre":
-						$now = new DateTime();
-						$gameDate = new DateTime($game['date']);
-						$timeToGame = $gameDate->getTimestamp() - $now->getTimestamp();
-						if ($timeToGame < 1200) {
-							$nflSleepTime = 30;
-						}
-						break;
-					case "in":						
-						$nflSleepTime = 5;
-						break;
-					case "post":
-						if ($nflGameStatus == 'in') {
-							if ($nflNewTeamScore > $nflNewOppoScore) {
-								if ($nflWinSequence != 'none') {
-									insertPlaylistImmediate($nflWinSequence);
-									logEntry("Your NFL team won! Playing sequence.");								
-								} else {
-									logEntry("Your NFL team won but no sequence selected");
-								}
-							}
-						}
-						$nflSleepTime = 600;
-						break;
-					default:
-						$nflSleepTime = 600;					
-				}
-
-				//update stored game status
-				if ($nflGameStatus != $game['status']['type']['state']) {
-					WriteSettingToFile("nflGameStatus",$game['status']['type']['state'],$pluginName);
-				}
-
-				break;
-			}
-			
-		}
-        
-		//log if no game found
-		switch ($gameFound){
-			case true:
-				if ($game['date'] != $nflKickoff){
-					$nflKickoff = $game['date'];
-				}
-				break;
-			default:
-				logEntry("Your NFL team is not playing this week.");
-				WriteSettingToFile("nflKickoff","0",$pluginName);
-		}	
+		array_push($activeLeagues, 'nfl');
 	}
-
 	if ($ncaaTeamID != '') {
-		
-		//log polling
+		array_push($activeLeagues, 'ncaa');
+	}
+	if ($nhlTeamID != '') {
+		array_push($activeLeagues, 'nhl');
+	}
+	if ($mlbTeamID != '') {
+		array_push($activeLeagues, 'mlb');
+	}
+
+	//cycle through each league
+	foreach ($activeLeagues as $league) {
 		if ($logLevel >= 5) {
-			logEntry("Polling ESPN NCAA API");
-			echo "Polling ESPN NCAA API";
+			logEntry("Parsing league {$league}");	
+		}
+ 
+		if (strlen(urldecode($pluginSettings["{$league}GameStatus"]))>1){
+			${$league . "GameStatus"}=urldecode($pluginSettings["{$league}GameStatus"]);
+		} else {
+			${$league . "GameStatus"}="";
+		}
+		if (strlen(urldecode($pluginSettings["{$league}TeamNextEventID"]))>1){
+			${$league . "TeamNextEventID"}=urldecode($pluginSettings["{$league}TeamNextEventID"]);
+		} else {
+			${$league . "TeamNextEventID"}="";
+		}
+		if (strlen(urldecode($pluginSettings["{$league}Start"]))>1){
+			${$league . "Start"}=urldecode($pluginSettings["{$league}Start"]);
+		} else {
+			${$league . "Start"}="";
+		}
+		if (strlen(urldecode($pluginSettings["{$league}MyScore"]))>0){
+			${$league . "MyScore"}=urldecode($pluginSettings["{$league}MyScore"]);
+		} else {
+			${$league . "MyScore"}="0";
+		}
+		if (strlen(urldecode($pluginSettings["{$league}OppoScore"]))>0){
+			${$league . "OppoScore"}=urldecode($pluginSettings["{$league}OppoScore"]);
+		} else {
+			${$league . "OppoScore"}="0";
+		}
+		if (strlen(urldecode($pluginSettings["{$league}OppoID"]))>0){
+			${$league . "OppoID"}=urldecode($pluginSettings["{$league}OppoID"]);
+		} else {
+			${$league . "OppoID"}="";
+		}
+		if (strlen(urldecode($pluginSettings["{$league}WinSequence"]))>1){
+			${$league . "WinSequence"}=urldecode($pluginSettings["{$league}WinSequence"]);
+		} else {
+			${$league . "WinSequence"}="";
+		}
+	
+		if ($league == "nfl" || $league == "ncaa") {
+	
+			if (strlen(urldecode($pluginSettings["{$league}TouchdownSequence"]))>1){
+				${$league . "TouchdownSequence"}=urldecode($pluginSettings["{$league}TouchdownSequence"]);
+			} else {
+				${$league . "TouchdownSequence"}="";
+			}
+			if (strlen(urldecode($pluginSettings["{$league}FieldgoalSequence"]))>1){
+				${$league . "FieldgoalSequence"}=urldecode($pluginSettings["{$league}FieldgoalSequence"]);
+			} else {
+				${$league . "FieldgoalSequence"}="";
+			}
+
+			$sport = "football";
+	
+		} elseif ($league == "nhl" || $league == "mlb") {
+	
+			if (strlen(urldecode($pluginSettings["{$league}ScoreSequence"]))>1){
+				${$league . "ScoreSequence"}=urldecode($pluginSettings["{$league}ScoreSequence"]);
+			} else {
+				${$league . "ScoreSequence"}="";
+			}
+
+			switch ($league) {
+				case 'nhl' : $sport = "hockey";
+					break; 
+				case 'mlb' : $sport = "baseball";
+			}
+	
 		}
 
-		//get NCAA score
-		$url = "http://site.api.espn.com/apis/site/v2/sports/football/college-football/scoreboard?groups={$ncaaTeamGroupID}";
-		$options = array(
-		'http' => array(
-			'method'  => 'GET',
-			)
-		);
-		
-		$context = stream_context_create( $options );
-		$games = file_get_contents( $url, false, $context );
-		$games = json_decode($games, true);
-		$games = $games['events'];
-
-		$gameFound = false;
-
-		foreach($games as $game) {
-			if (strpos($game['shortName'], $ncaaTeamAbbreviation) !== false) {
-				$gameFound = true;
-
-				// set kickoff time
-				WriteSettingToFile("ncaaKickoff",$game['date'],$pluginName);				
-
-				if ($game['competitions'][0]['competitors'][0]['team']['abbreviation'] == $ncaaTeamAbbreviation) {
-					$ncaaTeamIndex = 0;
-					$ncaaOppoIndex = 1;
-				} else {
-					$ncaaTeamIndex = 1;
-					$ncaaOppoIndex = 0;
+		//run game checks based on prior game status
+		switch (${$league . "GameStatus"}) {
+			case "pre":
+				if ($logLevel >= 5) {
+					logEntry("{$league} Game Status is Pre");	
 				}
+				$now = new DateTime();
+				$gameDate = new DateTime(${$league . "Start"});
+				$timeToGame = $gameDate->getTimestamp() - $now->getTimestamp();
+				if ($timeToGame < 1200) {
+					if ($logLevel >= 5) {
+						logEntry("{$league} Game is 20 min or less from gametime");	
+					}
+					${$league . "SleepTime"} = 30;
+					//check game status
+					$status = getGameStatus($sport, $league, ${$league . "TeamNextEventID"}, ${$league . "TeamID"});
+					if ($status['state'] == "in") {
+						logEntry("{$league} game is now playing.");
+						WriteSettingToFile("{$league}GameStatus",$status['state'],$pluginName);
+					}
+				}
+
+				break;
+
+			case "post":
+				if ($logLevel >= 5) {
+					logEntry("{$league} Game Status is Post");	
+				}
+				//check for next game
+				$newInfo = getTeamInfo($sport, $league, ${$league . "TeamID"});
+				if ($newInfo['nextEventID'] != ${$league . "TeamNextEventID"}) {
+					WriteSettingToFile("{$league}TeamNextEventID",$newInfo['nextEventID'],$pluginName);
+					WriteSettingToFile("{$league}Start",$newInfo['nextEventDate'],$pluginName);
+					WriteSettingToFile("{$league}GameStatus","",$pluginName);
+					logEntry("{$league} Next game updated " . $newInfo['nextEventDate']);
+					//clear old scores
+					WriteSettingToFile("{$league}MyScore",0,$pluginName);
+					WriteSettingToFile("{$league}OppoScore",0,$pluginName);
+					updateTeamStatus(true);
+				}
+
+				${$league . "SleepTime"} = 600;
+
+				break;
+
+			default:
+
+				//log polling
+				if ($logLevel >= 5) {
+					logEntry("{$league} Game Status is In or Not Set. Polling ESPN API");	
+				}
+
+				//get game status
+				$status = getGameStatus($sport, $league, ${$league . "TeamNextEventID"}, ${$league . "TeamID"});
 
 				// set opponent ID
-				if ($ncaaOppoID != $game['competitions'][0]['competitors'][$ncaaOppoIndex]['team']['abbreviation']) {
-					WriteSettingToFile("ncaaOppoID",$game['competitions'][0]['competitors'][$ncaaOppoIndex]['team']['abbreviation'],$pluginName);
-					WriteSettingToFile("ncaaOppoName",$game['competitions'][0]['competitors'][$ncaaOppoIndex]['team']['displayName'],$pluginName);
+				if (${$league . "OppoID"} != $status['oppoID']) {
+					if ($logLevel >= 5) {
+						logEntry("{$league} Opponent Updated to " . ${$league . "OppoID"} . " from {$status['oppoID']}");	
+					}
+					WriteSettingToFile("{$league}OppoID",$status['oppoID'],$pluginName);
+					WriteSettingToFile("{$league}OppoName",$status['oppoName'],$pluginName);
+					WriteSettingToFile("{$league}OppoAbbreviation",$status['oppoAbbreviation'],$pluginName);
 				}
-			
-				//get current scores
-				$ncaaNewTeamScore = $game['competitions'][0]['competitors'][$ncaaTeamIndex]['score'];
-				$ncaaNewOppoScore = $game['competitions'][0]['competitors'][$ncaaOppoIndex]['score'];
-			
+
 				//check score changes
-				if ($ncaaMyScore + 6 == $ncaaNewTeamScore) {
-					//play touchdown sequence if set
-					if ($ncaaTouchdownSequence != 'none') {
-						insertPlaylistImmediate($caaTouchdownSequence);
-						logEntry("NCAA Touchdown! Playing sequence.");					
-					} else {
-						logEntry("NCAA Touchdown Triggered but no sequence selected");
+				if ($sport == "football") {
+
+					if (${$league . "MyScore"} + 6 == $status['myScore']) {
+						//play touchdown sequence if set
+						if (${$league . "TouchdownSequence"} != '') {
+							insertPlaylistImmediate(${$league . "TouchdownSequence"});
+							logEntry("{$league} Touchdown! Playing sequence.");					
+						} else {
+							logEntry("{$league} Touchdown Triggered but no sequence selected");
+						}
+					} elseif (${$league . "MyScore"} + 3 == $status['myScore']) {
+						//play fieldgoal sequence if set
+						if (${$league . "FieldgoalSequence"} != '') {
+							insertPlaylistImmediate(${$league . "FieldgoalSequence"});
+							logEntry("{$league} Fieldgoal! Playing sequence.");					
+						} else {
+							logEntry("{$league} Fieldgoal Triggered but no sequence selected");
+						}
 					}
-				} elseif ($ncaaMyScore + 3 == $ncaaNewTeamScore) {
-					//play fieldgoal sequence if set
-					if ($ncaaFieldgoalSequence != 'none') {
-						insertPlaylistImmediate($ncaaFieldgoalSequence);
-						logEntry("NCAA Fieldgoal! Playing sequence.");					
-					} else {
-						logEntry("NCAA Fieldgoal Triggered but no sequence selected");
-					}
+
+				} elseif ($sport == "hockey" || $sport == "baseball") {
+					if (${$league . "MyScore"} < $status['myScore']) {
+						//play score sequence if set
+						if (${$league . "ScoreSequence"} != '') {
+							insertPlaylistImmediate(${$league . "ScoreSequence"});
+							logEntry("{$league} Score! Playing sequence.");					
+						} else {
+							logEntry("{$league} Score Triggered but no sequence selected");
+						}
+					}	
 				}
-			
+
 				//update stored scores
-				if ($ncaaMyScore != $ncaaNewTeamScore) {
-					WriteSettingToFile("ncaaMyScore",$ncaaNewTeamScore,$pluginName);
+				if (${$league . "MyScore"} != $status['myScore']) {
+					WriteSettingToFile("{$league}MyScore",$status['myScore'],$pluginName);
+					logEntry("Updating {$league} MyScore to " . $status['myScore']);
 				}
-				if ($ncaaOppoScore != $ncaaNewOppoScore) {
-					WriteSettingToFile("ncaaOppoScore",$ncaaNewOppoScore,$pluginName);
+				if (${$league . "OppoScore"} != $status['oppoScore']) {
+					WriteSettingToFile("{$league}OppoScore",$status['oppoScore'],$pluginName);
+					logEntry("Updating {$league} OppoScore to " . $status['oppoScore']);
 				}
 
 				//update sleep timer
-				switch ($game['status']['type']['state']){
-					case "pre":
-						$now = new DateTime();
-						$gameDate = new DateTime($game['date']);
-						$timeToGame = $gameDate->getTimestamp() - $now->getTimestamp();
-						if ($timeToGame < 1200) {
-							$ncaaSleepTime = 30;
+				switch ($status['state']){
+					case "in":
+										
+						${$league . "SleepTime"} = 5;
+						if (${$league . "GameStatus"} != "in") {
+							WriteSettingToFile("{$league}GameStatus",$status['state'],$pluginName);
+							if ($logLevel >= 5) {
+								logEntry("{$league} Game Status updating to in");	
+							}	
 						}
-						break;
-					case "in":						
-						$ncaaSleepTime = 5;
 						break;
 					case "post":
-						if ($ncaaGameStatus == 'in') {
-							if ($ncaaNewTeamScore > $ncaaNewOppoScore) {
-								if ($ncaaWinSequence != 'none') {
-									insertPlaylistImmediate($ncaaWinSequence);
-									logEntry("Your NCAA team won! Playing sequence.");								
-								} else {
-									logEntry("Your NCAA team won but no sequence selected");
-								}
+						if ($logLevel >= 5) {
+							logEntry("{$league} Game Status updating to post");	
+						}
+						if ($status['myScore'] > $status['oppoScore']) {
+							if (${$league . "WinSequence"} != '') {
+								insertPlaylistImmediate(${$league . "WinSequence"});
+								logEntry("Your {$league} team won! Playing sequence.");								
+							} else {
+								logEntry("Your {$league} team won but no sequence selected");
 							}
 						}
-						$ncaaSleepTime = 600;
+						WriteSettingToFile("{$league}GameStatus",$status['state'],$pluginName);
+						${$league . "SleepTime"} = 600;
 						break;
 					default:
-						$ncaaSleepTime = 600;					
+						if ($logLevel >= 5) {
+							logEntry("{$league} Game Status updating to {$status['state']}");	
+						}
+						WriteSettingToFile("{$league}GameStatus",$status['state'],$pluginName);
+						${$league . "SleepTime"} = 600;					
 				}
 
-				//update stored game status
-				if ($ncaaGameStatus != $game['status']['type']['state']) {
-					WriteSettingToFile("ncaaGameStatus",$game['status']['type']['state'],$pluginName);
-				}
-
-				break;
-			}
-			
 		}
-        
-		//log if no game found
-		switch ($gameFound){
-			case true:
-				if ($game['date'] != $ncaaKickoff){
-					$ncaaKickoff = $game['date'];
-				}
-				break;
-			default:
-				logEntry("Your NCAA team is not playing this week.");
-				WriteSettingToFile("ncaaKickoff","0",$pluginName);
-		}
+	
 	}
 
-
-	return min($nflSleepTime, $ncaaSleepTime);
+	return min($nflSleepTime, $ncaaSleepTime, $nhlSleepTime);
 }
 	
 function insertPlaylistImmediate($playlist) {

@@ -9,35 +9,6 @@ if (file_exists($pluginConfigFile)) {
   $pluginSettings = parse_ini_file($pluginConfigFile);
 }
 
-//set defaults if nothing saved
-if (strlen(urldecode($pluginSettings['nflTeamID']))<1){
-  WriteSettingToFile("nflTeamID",urlencode(""),$pluginName);
-}
-if (strlen(urldecode($pluginSettings['nflTouchdownSequence']))<1){
-  WriteSettingToFile("nflTouchdownSequence",urlencode(""),$pluginName);
-}
-if (strlen(urldecode($pluginSettings['nflFieldgoalSequence']))<1){
-  WriteSettingToFile("nflFieldgoalSequence",urlencode(""),$pluginName);
-}
-if (strlen(urldecode($pluginSettings['nflWinSequence']))<1){
-  WriteSettingToFile("nflWinSequence",urlencode(""),$pluginName);
-}
-if (strlen(urldecode($pluginSettings['ncaaTeamID']))<1){
-  WriteSettingToFile("ncaaTeamID",urlencode(""),$pluginName);
-}
-if (strlen(urldecode($pluginSettings['ncaaTouchdownSequence']))<1){
-  WriteSettingToFile("ncaaTouchdownSequence",urlencode(""),$pluginName);
-}
-if (strlen(urldecode($pluginSettings['ncaaFieldgoalSequence']))<1){
-  WriteSettingToFile("ncaaFieldgoalSequence",urlencode(""),$pluginName);
-}
-if (strlen(urldecode($pluginSettings['ncaaWinSequence']))<1){
-  WriteSettingToFile("ncaaWinSequence",urlencode(""),$pluginName);
-}
-if (strlen(urldecode($pluginSettings['logLevel']))<1){
-  WriteSettingToFile("logLevel",urlencode("4"),$pluginName);
-}
-
 foreach ($pluginSettings as $key => $value) { 
   ${$key} = urldecode($value);
 }
@@ -83,7 +54,7 @@ foreach ($pluginSettings as $key => $value) {
       <div class="card">
         <div class="justify-content-md-center row py-3">
           <div class="col-md-auto">
-            <h1>NFL/NCAA Touchdown Plugin</h1>
+            <h1>Pro Sports Scoring Plugin</h1>
           </div>
         </div>
       </div>
@@ -95,6 +66,12 @@ foreach ($pluginSettings as $key => $value) {
           </li>
           <li class="nav-item" role="presentation">
             <button class="nav-link" id="ncaa-tab" data-bs-toggle="tab" data-bs-target="#ncaa" type="button" role="tab" aria-controls="ncaa" aria-selected="false">NCAA</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="nhl-tab" data-bs-toggle="tab" data-bs-target="#nhl" type="button" role="tab" aria-controls="nhl" aria-selected="false">NHL</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="mlb-tab" data-bs-toggle="tab" data-bs-target="#mlb" type="button" role="tab" aria-controls="mlb" aria-selected="false">MLB</button>
           </li>
           <li class="nav-item" role="presentation">
             <button class="nav-link" id="settings-tab" data-bs-toggle="tab" data-bs-target="#settings" type="button" role="tab" aria-controls="settings" aria-selected="false">Settings</button>
@@ -117,7 +94,7 @@ foreach ($pluginSettings as $key => $value) {
               </div>
               <div class="col-md-6">            
                   <div class="input-group">				
-                    <? PrintSettingSelect("nflTeamID", "nflTeamID", 0, 0, $defaultValue="", getNFLTeams(), $pluginName, $callbackName = "updateNFLLogo", $changedFunction = "");?>				
+                    <? PrintSettingSelect("nflTeamID", "nflTeamID", 0, 0, $defaultValue="", getTeams('football', 'nfl'), $pluginName, $callbackName = "updateNFLTeam", $changedFunction = "");?>				
                   </div>            
               </div>
             </div>
@@ -239,6 +216,112 @@ foreach ($pluginSettings as $key => $value) {
               </div>
             </div>
           </div>
+          <div class="tab-pane fade" id="nhl" role="tabpanel" aria-labelledby="nhl-tab">
+            <div style= "height:100; width:100; margin:auto" class="pt-3">
+              <img id="nhlLogoImage" src="<?echo $nhlTeamLogo;?>" width="100" height ="100">
+            </div>
+            <!-- NHL Team -->
+            <div class="justify-content-md-center row pt-5 py-4">		
+              <div class="col-md-6">		  
+                <div class="card-title h5">
+                  NHL Team
+                </div>
+                <div class="mb-2 text-muted small h6">
+                  Select your NHL team
+                </div>
+              </div>
+              <div class="col-md-6">            
+                  <div class="input-group">				
+                    <? PrintSettingSelect("nhlTeamID", "nhlTeamID", 0, 0, $defaultValue="", getTeams('hockey', 'nhl'), $pluginName, $callbackName = "updateNHLLogo", $changedFunction = "");?>				
+                  </div>            
+              </div>
+            </div>
+            <!-- Goal Sequence -->
+            <div class="justify-content-md-center row pb-5">
+              <div class="col-md-6">
+                <div class="card-title h5">
+                  Goal Sequence
+                </div>
+                <div class="mb-2 text-muted small h6">
+                  Select the sequence to play on a goal<br>Select no sequence to disable
+                </div>
+              </div>
+              <div class="col-md-6">            
+                  <div class="input-group">
+                    <? PrintSettingSelect("nhlScoreSequence", "nhlScoreSequence", 0, 0, $defaultValue="", getSequences(), $pluginName, $callbackName = "", $changedFunction = ""); ?>
+                  </div>            
+              </div>
+            </div>
+            <!-- Win Sequence -->
+            <div class="justify-content-md-center row pb-5">
+              <div class="col-md-6">
+                <div class="card-title h5">
+                  Win Sequence
+                </div>
+                <div class="mb-2 text-muted small h6">
+                  Select the sequence to play if your team wins<br>Select no sequence to disable
+                </div>
+              </div>
+              <div class="col-md-6">            
+                  <div class="input-group">
+                    <? PrintSettingSelect("nhlWinSequence", "nhlWinSequence", 0, 0, $defaultValue="", getSequences(), $pluginName, $callbackName = "", $changedFunction = ""); ?>                
+                  </div>            
+              </div>
+            </div>
+          </div>
+          <div class="tab-pane fade" id="mlb" role="tabpanel" aria-labelledby="mlb-tab">
+            <div style= "height:100; width:100; margin:auto" class="pt-3">
+              <img id="mlbLogoImage" src="<?echo $nhlTeamLogo;?>" width="100" height ="100">
+            </div>
+            <!-- MLB Team -->
+            <div class="justify-content-md-center row pt-5 py-4">		
+              <div class="col-md-6">		  
+                <div class="card-title h5">
+                  MLB Team
+                </div>
+                <div class="mb-2 text-muted small h6">
+                  Select your MLB team
+                </div>
+              </div>
+              <div class="col-md-6">            
+                  <div class="input-group">				
+                    <? PrintSettingSelect("mlbTeamID", "mlbTeamID", 0, 0, $defaultValue="", getTeams('baseball', 'mlb'), $pluginName, $callbackName = "updateMLBLogo", $changedFunction = "");?>				
+                  </div>            
+              </div>
+            </div>
+            <!-- Run Sequence -->
+            <div class="justify-content-md-center row pb-5">
+              <div class="col-md-6">
+                <div class="card-title h5">
+                  Run Sequence
+                </div>
+                <div class="mb-2 text-muted small h6">
+                  Select the sequence to play on a run<br>Select no sequence to disable
+                </div>
+              </div>
+              <div class="col-md-6">            
+                  <div class="input-group">
+                    <? PrintSettingSelect("mlbScoreSequence", "mlbScoreSequence", 0, 0, $defaultValue="", getSequences(), $pluginName, $callbackName = "", $changedFunction = ""); ?>
+                  </div>            
+              </div>
+            </div>
+            <!-- Win Sequence -->
+            <div class="justify-content-md-center row pb-5">
+              <div class="col-md-6">
+                <div class="card-title h5">
+                  Win Sequence
+                </div>
+                <div class="mb-2 text-muted small h6">
+                  Select the sequence to play if your team wins<br>Select no sequence to disable
+                </div>
+              </div>
+              <div class="col-md-6">            
+                  <div class="input-group">
+                    <? PrintSettingSelect("mlbWinSequence", "mlbWinSequence", 0, 0, $defaultValue="", getSequences(), $pluginName, $callbackName = "", $changedFunction = ""); ?>                
+                  </div>            
+              </div>
+            </div>
+          </div>
           <div class="tab-pane fade" id="settings" role="tabpanel" aria-labelledby="settings-tab">
             <!-- Enable Plugin -->
             <div class="justify-content-md-center row pt-4">
@@ -279,11 +362,11 @@ foreach ($pluginSettings as $key => $value) {
   </div>
   <script>
   
-  function updateNFLLogo(){
+  function updateNFLTeam(){
 		
 	$.ajax({ 
 		url: 'plugin.php?_menu=status&plugin=fpp-nfl&nopage=1&page=functions.inc.php',
-        data: {action: 'getNFLLogo'},
+        data: {action: 'updateNFLTeam'},
         type: 'post',
         success: function(output) {
             $.ajax({ 
@@ -302,7 +385,7 @@ foreach ($pluginSettings as $key => $value) {
 		
     $.ajax({ 
       url: 'plugin.php?_menu=status&plugin=fpp-nfl&nopage=1&page=functions.inc.php',
-          data: {action: 'getNCAALogo'},
+          data: {action: 'updateNCAATeam'},
           type: 'post',
           success: function(output) {
               $.ajax({ 
@@ -316,7 +399,45 @@ foreach ($pluginSettings as $key => $value) {
           }
     });
       
-    }
+  }
+  function updateNHLLogo(){
+		
+    $.ajax({ 
+      url: 'plugin.php?_menu=status&plugin=fpp-nfl&nopage=1&page=functions.inc.php',
+          data: {action: 'updateNHLTeam'},
+          type: 'post',
+          success: function(output) {
+              $.ajax({ 
+        url: 'api/plugin/fpp-nfl/settings/nhlTeamLogo',       
+        type: 'get',
+        success: function(data) {		
+          var logo= data.nhlTeamLogo;
+          document.getElementById('nhlLogoImage').src = logo;					
+        }
+      });
+          }
+    });
+      
+  }
+  function updateMLBLogo(){
+		
+    $.ajax({ 
+      url: 'plugin.php?_menu=status&plugin=fpp-nfl&nopage=1&page=functions.inc.php',
+          data: {action: 'updateMLBTeam'},
+          type: 'post',
+          success: function(output) {
+              $.ajax({ 
+        url: 'api/plugin/fpp-nfl/settings/mlbTeamLogo',       
+        type: 'get',
+        success: function(data) {		
+          var logo= data.mlbTeamLogo;
+          document.getElementById('mlbLogoImage').src = logo;					
+        }
+      });
+          }
+    });
+      
+  }
   function setEnabledStatus(){
 	$.ajax({ 
 		url: 'plugin.php?_menu=status&plugin=fpp-nfl&nopage=1&page=nfl.php',
