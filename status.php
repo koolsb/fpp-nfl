@@ -63,7 +63,7 @@ if ($pluginEnabled=="OFF"){
 		<div class="card">
 			<div class="justify-content-md-center row py-3">
 				<div class="col-md-auto">
-					<h1>NFL Touchdown Plugin</h1>
+					<h1>Pro Sports Scoring Plugin</h1>
 				</div>
 			</div>
 		</div>

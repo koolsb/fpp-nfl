@@ -13,13 +13,13 @@
 
 $menuEntries = Array(
 	Array(
-		'text' => 'NFL/NCAA Touchdown Setup',
+		'text' => 'Pro Sports Scoring Setup',
 		'type' => 'content',
 		'page' => 'content.php',
 		'wrap' => 1
 	),
 	Array(
-		'text' => 'NFL/NCAA Team Status',
+		'text' => 'Pro Sports Scoring Status',
 		'type' => 'status',
 		'page' => 'status.php',
 		'wrap' => 1
