@@ -4,6 +4,7 @@ include_once "/opt/fpp/www/common.php";
 $pluginName = basename(dirname(__FILE__)); 
 $logFile = $settings['logDirectory']."/".$pluginName.".log";
 $pluginConfigFile = $settings['configDirectory'] . "/plugin." . $pluginName;
+$leagues = array('nfl', 'ncaa', 'nhl', 'mlb');
 
 if (file_exists($pluginConfigFile)) {
   $pluginSettings = parse_ini_file ($pluginConfigFile);
@@ -30,22 +31,26 @@ if(isset($_POST['action']) && !empty($_POST['action'])) {
 }
 
 function getTeams($sport='football', $league='nfl'){
-	$url = "http://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/teams";
-	$options = array(
-	'http' => array(
-		'method'  => 'GET',
-		)
-	);
-	$context = stream_context_create( $options );
-	$result = file_get_contents( $url, false, $context );
-	$result = json_decode($result, true);
-	$teams = $result['sports']['0']['leagues']['0']['teams'];
-	$teamNames["No team"]="";
-	foreach ($teams as $team) {
-		$team = $team['team'];
-        $teamNames[$team['displayName']] = $team['id'];		
-	}	
-	return $teamNames;
+	if ($sport == 'football' && $league == 'ncaa') {
+		return getNCAATeams();
+	} else {
+		$url = "http://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/teams";
+		$options = array(
+		'http' => array(
+			'method'  => 'GET',
+			)
+		);
+		$context = stream_context_create( $options );
+		$result = file_get_contents( $url, false, $context );
+		$result = json_decode($result, true);
+		$teams = $result['sports']['0']['leagues']['0']['teams'];
+		$teamNames["No team"]="";
+		foreach ($teams as $team) {
+			$team = $team['team'];
+			$teamNames[$team['displayName']] = $team['id'];		
+		}	
+		return $teamNames;
+	}
 }
 
 function getNCAATeams(){
@@ -112,9 +117,16 @@ function getTeamInfo($sport, $league, $team){
 	$teamInfo["logo"] = $result['team']['logos'][0]['href'];
 	$teamInfo["abbreviation"] = $result['team']['abbreviation'];
 	$teamInfo["name"] = $result['team']['displayName'];
-	$teamInfo["nextEventID"] = $result['team']['nextEvent'][0]['id'];
-	$teamInfo["nextEventDate"] = $result['team']['nextEvent'][0]['date'];
-	$teamInfo["nextEventStatus"] = $result['team']['nextEvent'][0]['competitions'][0]['status']['type']['state'];
+	if (isset($result['team']['nextEvent'][0])) {
+		$teamInfo["nextEventID"] = $result['team']['nextEvent'][0]['id'];
+		$teamInfo["nextEventDate"] = $result['team']['nextEvent'][0]['date'];
+		$teamInfo["nextEventStatus"] = $result['team']['nextEvent'][0]['competitions'][0]['status']['type']['state'];
+	} else {
+		$teamInfo["nextEventID"] = '';
+		$teamInfo["nextEventDate"] = 0;
+		$teamInfo["nextEventStatus"] = 'post';
+	}
+	
 	return $teamInfo;
 
 }
@@ -155,7 +167,9 @@ function updateTeam($sport, $league){
 	logEntry("{$league} Abbreviation updated " . $teamAbbreviation);
 	logEntry("{$league} Name updated " . $teamName);
 	logEntry("{$league} Next game updated " . $teamNextEventDate);
-	updateTeamStatus(true);
+	if ($teamNextEventID != '') {
+		updateTeamStatus(true);
+	}
 	return $teamLogo;
 
 }
@@ -208,6 +222,7 @@ function updateTeamStatus($reparseSettings=true){
 	global $pluginConfigFile;
 	global $pluginName;
 	global $pluginSettings; 
+	global $leagues;
 
 	//reparse settings file - needs to reread team group id on change
 	if ($reparseSettings) {
@@ -228,7 +243,7 @@ function updateTeamStatus($reparseSettings=true){
 	}
 	
 	//get active leagues
-	foreach (array('nfl', 'ncaa', 'nhl', 'mlb') as $league) {
+	foreach ($leagues as $league) {
 
 		if (strlen(urldecode($pluginSettings["{$league}TeamID"]))>0){
 			${$league . "TeamID"}=urldecode($pluginSettings["{$league}TeamID"]);

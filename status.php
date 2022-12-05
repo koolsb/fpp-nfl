@@ -20,6 +20,15 @@ if ($pluginEnabled=="OFF"){
 	$showDisabledDiv ="display:none;";
 }
 
+//get active leagues
+$activeLeagues = array();
+
+foreach ($leagues as $league) {
+	if (${$league . "TeamID"} != '') {
+		array_push($activeLeagues, $league);
+	}
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -79,30 +88,36 @@ if ($pluginEnabled=="OFF"){
 					</div>          
 				</div>
 				<div class="justify-content-md-center row">
-					<?php if ($nflTeamID != '') { ?>
-					<div class="col-6 py-5">
+					<?php foreach($activeLeagues as $league) { ?>
+						<div class="col-6 py-5">
 						<div  style= "height:100; width:100; margin:auto">
-							<img id="logoImage" src="<?echo $nflTeamLogo;?>" width="100" height ="100">
+							<img id="logoImage" src="<?echo ${$league . "TeamLogo"};?>" width="100" height ="100">
 						</div>	
 						<div class="justify-content-md-center row pt-4">
 							<div class="col-md-4">
 								<div class="card-title h5">
-									Kickoff:
+									<?php if ($league == "nfl" || $league == "ncaa") {
+										echo "Kickoff:";
+									} elseif ($league == "nhl") {
+										echo "Puck Drop:";
+									} elseif ($league == "mlb") {
+										echo "First Pitch";
+									} ?>
 								</div>
 							</div>
 							<div class="col-md-7">
 								<div class="card-title">
-								<?php if ($nflStart == "0") {
+								<?php if (${$league . "Start"} == "0") {
 									echo 'No game scheduled this week';
 								} else {
-									$nflStart = new DateTime($nflStart, new DateTimeZone("UTC"));
-									$nflStart->setTimezone(new DateTimeZone(date_default_timezone_get()));
-									echo $nflStart->format("l, F j @ g:i A");
+									${$league . "Start"} = new DateTime(${$league . "Start"}, new DateTimeZone("UTC"));
+									${$league . "Start"}->setTimezone(new DateTimeZone(date_default_timezone_get()));
+									echo ${$league . "Start"}->format("l, F j @ g:i A");
 								} ?>
 								</div>
 							</div>
 						</div>
-						<?php if (!in_array($nflStart, array("0", "1"))) { ?>
+						<?php if (!in_array(${$league . "Start"}, array("0", "1"))) { ?>
 						<div class="justify-content-md-center row">
 							<div class="col-md-4">
 								<div class="card-title h5">
@@ -111,7 +126,7 @@ if ($pluginEnabled=="OFF"){
 							</div>
 							<div class="col-md-7">
 								<div class="card-title">
-									<?=$nflOppoName?>
+									<?=${$league . "OppoName"}?>
 								</div>
 							</div>
 						</div>
@@ -123,11 +138,11 @@ if ($pluginEnabled=="OFF"){
 							</div>
 							<div class="col-md-7">
 								<div class="card-title">
-									<?php if ($nflGameStatus == "pre") {
+									<?php if (${$league . "GameStatus"} == "pre") {
 										echo "Pregame";
-									} elseif ($nflGameStatus == "in") { 
+									} elseif (${$league . "GameStatus"} == "in") { 
 										echo "Playing";
-									} elseif ($nflGameStatus == "post") {
+									} elseif (${$league . "GameStatus"} == "post") {
 										echo "Postgame";
 									} ?>
 								</div>
@@ -136,264 +151,24 @@ if ($pluginEnabled=="OFF"){
 						<div class="justify-content-md-center row">
 							<div class="col-md-4">
 								<div class="card-title h5">
-									<?=$nflTeamAbbreviation?> Score:
+									<?=${$league . "TeamAbbreviation"}?> Score:
 								</div>
 							</div>
 							<div class="col-md-7">
 								<div class="card-title">
-									<?=$nflMyScore?>
+									<?=${$league . "MyScore"}?>
 								</div>
 							</div>
 						</div>
 						<div class="justify-content-md-center row">
 							<div class="col-md-4">
 								<div class="card-title h5">
-									<?=$nflOppoAbbreviation?> Score:
+									<?=${$league . "OppoAbbreviation"}?> Score:
 								</div>
 							</div>
 							<div class="col-md-7">
 								<div class="card-title">
-									<?=$nflOppoScore?>
-								</div>
-							</div>
-						</div>
-						<?php } ?>
-					</div>
-					<?php } if ($ncaaTeamID != '') { ?>
-					<div class="col-6 py-5">
-						<div  style= "height:100; width:100; margin:auto">
-							<img id="logoImage" src="<?echo $ncaaTeamLogo;?>" width="100" height ="100">
-						</div>	
-						<div class="justify-content-md-center row pt-4">
-							<div class="col-md-4">
-								<div class="card-title h5">
-									Kickoff:
-								</div>
-							</div>
-							<div class="col-md-7">
-								<div class="card-title">
-								<?php if ($ncaaStart == "0") {
-									echo 'No game scheduled this week';
-								} else {
-									$ncaaStart = new DateTime($ncaaStart, new DateTimeZone("UTC"));
-									$ncaaStart->setTimezone(new DateTimeZone(date_default_timezone_get()));
-									echo $ncaaStart->format("l, F j @ g:i A");
-								} ?>
-								</div>
-							</div>
-						</div>
-						<?php if (!in_array($ncaaStart, array("0", "1"))) { ?>
-						<div class="justify-content-md-center row">
-							<div class="col-md-4">
-								<div class="card-title h5">
-									Opponent:
-								</div>
-							</div>
-							<div class="col-md-7">
-								<div class="card-title">
-									<?=$ncaaOppoName?>
-								</div>
-							</div>
-						</div>
-						<div class="justify-content-md-center row pt-5">
-							<div class="col-md-4">
-								<div class="card-title h5">
-									Game Status:
-								</div>
-							</div>
-							<div class="col-md-7">
-								<div class="card-title">
-									<?php if ($ncaaGameStatus == "pre") {
-										echo "Pregame";
-									} elseif ($ncaaGameStatus == "in") { 
-										echo "Playing";
-									} elseif ($ncaaGameStatus == "post") {
-										echo "Postgame";
-									} ?>
-								</div>
-							</div>
-						</div>
-						<div class="justify-content-md-center row">
-							<div class="col-md-4">
-								<div class="card-title h5">
-									<?=$ncaaTeamAbbreviation?> Score:
-								</div>
-							</div>
-							<div class="col-md-7">
-								<div class="card-title">
-									<?=$ncaaMyScore?>
-								</div>
-							</div>
-						</div>
-						<div class="justify-content-md-center row">
-							<div class="col-md-4">
-								<div class="card-title h5">
-									<?=$ncaaOppoAbbreviation?> Score:
-								</div>
-							</div>
-							<div class="col-md-7">
-								<div class="card-title">
-									<?=$ncaaOppoScore?>
-								</div>
-							</div>
-						</div>
-						<?php } ?>
-					</div>
-					<?php } if ($nhlTeamID != '') { ?>
-					<div class="col-6 py-5">
-						<div  style= "height:100; width:100; margin:auto">
-							<img id="logoImage" src="<?echo $nhlTeamLogo;?>" width="100" height ="100">
-						</div>	
-						<div class="justify-content-md-center row pt-4">
-							<div class="col-md-4">
-								<div class="card-title h5">
-									Puck Drop:
-								</div>
-							</div>
-							<div class="col-md-7">
-								<div class="card-title">
-								<?php if ($nhlStart == "0") {
-									echo 'No game scheduled this week';
-								} else {
-									$nhlStart = new DateTime($nhlStart, new DateTimeZone("UTC"));
-									$nhlStart->setTimezone(new DateTimeZone(date_default_timezone_get()));
-									echo $nhlStart->format("l, F j @ g:i A");
-								} ?>
-								</div>
-							</div>
-						</div>
-						<?php if (!in_array($nhlStart, array("0", "1"))) { ?>
-						<div class="justify-content-md-center row">
-							<div class="col-md-4">
-								<div class="card-title h5">
-									Opponent:
-								</div>
-							</div>
-							<div class="col-md-7">
-								<div class="card-title">
-									<?=$nhlOppoName?>
-								</div>
-							</div>
-						</div>
-						<div class="justify-content-md-center row pt-5">
-							<div class="col-md-4">
-								<div class="card-title h5">
-									Game Status:
-								</div>
-							</div>
-							<div class="col-md-7">
-								<div class="card-title">
-									<?php if ($nhlGameStatus == "pre") {
-										echo "Pregame";
-									} elseif ($nhlGameStatus == "in") { 
-										echo "Playing";
-									} elseif ($nhlGameStatus == "post") {
-										echo "Postgame";
-									} ?>
-								</div>
-							</div>
-						</div>
-						<div class="justify-content-md-center row">
-							<div class="col-md-4">
-								<div class="card-title h5">
-									<?=$nhlTeamAbbreviation?> Score:
-								</div>
-							</div>
-							<div class="col-md-7">
-								<div class="card-title">
-									<?=$nhlMyScore?>
-								</div>
-							</div>
-						</div>
-						<div class="justify-content-md-center row">
-							<div class="col-md-4">
-								<div class="card-title h5">
-									<?=$nhlOppoAbbreviation?> Score:
-								</div>
-							</div>
-							<div class="col-md-7">
-								<div class="card-title">
-									<?=$nhlOppoScore?>
-								</div>
-							</div>
-						</div>
-						<?php } ?>
-					</div>
-					<?php } if ($mlbTeamID != '') { ?>
-					<div class="col-6 py-5">
-						<div  style= "height:100; width:100; margin:auto">
-							<img id="logoImage" src="<?echo $mlbTeamLogo;?>" width="100" height ="100">
-						</div>	
-						<div class="justify-content-md-center row pt-4">
-							<div class="col-md-4">
-								<div class="card-title h5">
-									First Pitch:
-								</div>
-							</div>
-							<div class="col-md-7">
-								<div class="card-title">
-								<?php if ($mlbStart == "0") {
-									echo 'No game scheduled this week';
-								} else {
-									$mlbStart = new DateTime($mlbStart, new DateTimeZone("UTC"));
-									$mlbStart->setTimezone(new DateTimeZone(date_default_timezone_get()));
-									echo $mlbStart->format("l, F j @ g:i A");
-								} ?>
-								</div>
-							</div>
-						</div>
-						<?php if (!in_array($mlbStart, array("0", "1"))) { ?>
-						<div class="justify-content-md-center row">
-							<div class="col-md-4">
-								<div class="card-title h5">
-									Opponent:
-								</div>
-							</div>
-							<div class="col-md-7">
-								<div class="card-title">
-									<?=$mlbOppoName?>
-								</div>
-							</div>
-						</div>
-						<div class="justify-content-md-center row pt-5">
-							<div class="col-md-4">
-								<div class="card-title h5">
-									Game Status:
-								</div>
-							</div>
-							<div class="col-md-7">
-								<div class="card-title">
-									<?php if ($mlbGameStatus == "pre") {
-										echo "Pregame";
-									} elseif ($mlbGameStatus == "in") { 
-										echo "Playing";
-									} elseif ($mlbGameStatus == "post") {
-										echo "Postgame";
-									} ?>
-								</div>
-							</div>
-						</div>
-						<div class="justify-content-md-center row">
-							<div class="col-md-4">
-								<div class="card-title h5">
-									<?=$mlbTeamAbbreviation?> Score:
-								</div>
-							</div>
-							<div class="col-md-7">
-								<div class="card-title">
-									<?=$mlbMyScore?>
-								</div>
-							</div>
-						</div>
-						<div class="justify-content-md-center row">
-							<div class="col-md-4">
-								<div class="card-title h5">
-									<?=$mlbOppoAbbreviation?> Score:
-								</div>
-							</div>
-							<div class="col-md-7">
-								<div class="card-title">
-									<?=$mlbOppoScore?>
+									<?=${$league . "OppoScore"}?>
 								</div>
 							</div>
 						</div>
