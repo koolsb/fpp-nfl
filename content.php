@@ -18,26 +18,12 @@ foreach ($pluginSettings as $key => $value) {
 <html>
 <head>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
   <style>
     #bodyWrapper {
       background-color: #20222e;
     }
     .pageContent {
       background-color: #171720;
-    }
-    .plugin-body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      color: rgb(238, 238, 238);
-      background-color: rgb(0, 0, 0);
-      font-size: 1rem;
-      font-weight: 400;
-      line-height: 1.5;
-      padding-bottom: 2em;
-      background-repeat: no-repeat;
-      background-attachment: fixed;
-      background-position: top center;
-      background-size: auto 100%;
     }
     .card {
       background-color: rgba(59, 69, 84, 0.7);
@@ -53,7 +39,7 @@ foreach ($pluginSettings as $key => $value) {
       <div class="card">
         <div class="justify-content-md-center row py-3">
           <div class="col-md-auto">
-            <h1>Pro Sports Scoring Plugin</h1>
+            <h1 class="text-white">Pro Sports Scoring Plugin</h1>
           </div>
         </div>
       </div>
@@ -74,7 +60,7 @@ foreach ($pluginSettings as $key => $value) {
             <!-- Enable Plugin -->
             <div class="justify-content-md-center row pt-4">
               <div class="col-md-6">
-                <div class="card-title h5">
+                <div class="card-title h5 text-white">
                   Enable Plugin
                 </div>
                 <div class="mb-2 text-muted small h6">
@@ -90,7 +76,7 @@ foreach ($pluginSettings as $key => $value) {
             <!-- Log Level -->
             <div class="justify-content-md-center row">
               <div class="col-md-6">
-                <div class="card-title h5">
+                <div class="card-title h5 text-white">
                   Log Level
                 </div>
                 <div class="mb-2 text-muted small h6">
@@ -125,7 +111,7 @@ foreach ($pluginSettings as $key => $value) {
             <!-- <?=$league?> Team -->
             <div class="justify-content-md-center row pt-5 py-4">		
               <div class="col-md-6">		  
-                <div class="card-title h5">
+                <div class="card-title h5 text-white">
                   <?=strtoupper($league)?> Team
                 </div>
                 <div class="mb-2 text-muted small h6">
@@ -142,7 +128,7 @@ foreach ($pluginSettings as $key => $value) {
             <!-- Touchdown Sequence -->
             <div class="justify-content-md-center row pb-5">
               <div class="col-md-6">
-                <div class="card-title h5">
+                <div class="card-title h5  text-white">
                   Touchdown Sequence
                 </div>
                 <div class="mb-2 text-muted small h6">
@@ -158,7 +144,7 @@ foreach ($pluginSettings as $key => $value) {
             <!-- Fieldgoal Sequence -->
             <div class="justify-content-md-center row pb-5">
               <div class="col-md-6">
-                <div class="card-title h5">
+                <div class="card-title h5 text-white">
                   Fieldgoal Sequence
                 </div>
                 <div class="mb-2 text-muted small h6">
@@ -175,7 +161,7 @@ foreach ($pluginSettings as $key => $value) {
             <!-- Run Sequence -->
             <div class="justify-content-md-center row pb-5">
               <div class="col-md-6">
-                <div class="card-title h5">
+                <div class="card-title h5 text-white">
                   Score Sequence
                 </div>
                 <div class="mb-2 text-muted small h6">
@@ -192,7 +178,7 @@ foreach ($pluginSettings as $key => $value) {
             <!-- Win Sequence -->
             <div class="justify-content-md-center row pb-5">
               <div class="col-md-6">
-                <div class="card-title h5">
+                <div class="card-title h5 text-white">
                   Win Sequence
                 </div>
                 <div class="mb-2 text-muted small h6">

@@ -34,7 +34,7 @@ function getTeams($sport='football', $league='nfl'){
 	if ($sport == 'football' && $league == 'ncaa') {
 		return getNCAATeams();
 	} else {
-		$url = "http://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/teams";
+		$url = "https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/teams";
 		$options = array(
 		'http' => array(
 			'method'  => 'GET',

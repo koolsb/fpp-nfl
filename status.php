@@ -72,7 +72,7 @@ foreach ($leagues as $league) {
 		<div class="card">
 			<div class="justify-content-md-center row py-3">
 				<div class="col-md-auto">
-					<h1>Pro Sports Scoring Plugin</h1>
+					<h1 class="text-white">Pro Sports Scoring Plugin</h1>
 				</div>
 			</div>
 		</div>
@@ -81,7 +81,7 @@ foreach ($leagues as $league) {
         		<!-- Status -->
 				<div class="justify-content-md-center row pt-4">
 					<div class="col-md-auto">
-						<h3>Game Status</h3>
+						<h3 class="text-white">Game Status</h3>
 							<div style= "<?=$showDisabledDiv?>color:red;">
 								Notice: Plugin is disabled
 							</div>																
@@ -95,7 +95,7 @@ foreach ($leagues as $league) {
 						</div>	
 						<div class="justify-content-md-center row pt-4">
 							<div class="col-md-4">
-								<div class="card-title h5">
+								<div class="card-title h5 text-white">
 									<?php if ($league == "nfl" || $league == "ncaa") {
 										echo "Kickoff:";
 									} elseif ($league == "nhl") {
@@ -106,7 +106,7 @@ foreach ($leagues as $league) {
 								</div>
 							</div>
 							<div class="col-md-7">
-								<div class="card-title">
+								<div class="card-title text-white">
 								<?php if (${$league . "Start"} == "0") {
 									echo 'No game scheduled this week';
 								} else {
@@ -120,24 +120,24 @@ foreach ($leagues as $league) {
 						<?php if (!in_array(${$league . "Start"}, array("0", "1"))) { ?>
 						<div class="justify-content-md-center row">
 							<div class="col-md-4">
-								<div class="card-title h5">
+								<div class="card-title h5 text-white">
 									Opponent:
 								</div>
 							</div>
 							<div class="col-md-7">
-								<div class="card-title">
+								<div class="card-title text-white">
 									<?=${$league . "OppoName"}?>
 								</div>
 							</div>
 						</div>
 						<div class="justify-content-md-center row pt-5">
 							<div class="col-md-4">
-								<div class="card-title h5">
+								<div class="card-title h5 text-white">
 									Game Status:
 								</div>
 							</div>
 							<div class="col-md-7">
-								<div class="card-title">
+								<div class="card-title text-white">
 									<?php if (${$league . "GameStatus"} == "pre") {
 										echo "Pregame";
 									} elseif (${$league . "GameStatus"} == "in") { 
@@ -150,24 +150,24 @@ foreach ($leagues as $league) {
 						</div>
 						<div class="justify-content-md-center row">
 							<div class="col-md-4">
-								<div class="card-title h5">
+								<div class="card-title h5 text-white">
 									<?=${$league . "TeamAbbreviation"}?> Score:
 								</div>
 							</div>
 							<div class="col-md-7">
-								<div class="card-title">
+								<div class="card-title text-white">
 									<?=${$league . "MyScore"}?>
 								</div>
 							</div>
 						</div>
 						<div class="justify-content-md-center row">
 							<div class="col-md-4">
-								<div class="card-title h5">
+								<div class="card-title h5 text-white">
 									<?=${$league . "OppoAbbreviation"}?> Score:
 								</div>
 							</div>
 							<div class="col-md-7">
-								<div class="card-title">
+								<div class="card-title text-white">
 									<?=${$league . "OppoScore"}?>
 								</div>
 							</div>
