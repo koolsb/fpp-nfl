@@ -2,7 +2,7 @@
 	"repoName": "fpp-nfl",
 	"name": "Pro Sports Scoring Plugin",
 	"author": "Ben Kools (koolsb)",
-	"description": "Automatically play a celebratory sequence when your NFL, NHL, MLB or NCAA Football team scores or wins!",
+	"description": "DEPRECATED - use fpp-gameday (https://github.com/derwin12/fpp-gameday) instead. Automatically play a celebratory sequence when your NFL, NHL, MLB or NCAA Football team scores or wins!",
 	"homeURL": "https://github.com/koolsb/fpp-nfl",
 	"srcURL": "https://github.com/koolsb/fpp-nfl.git",
 	"bugURL": "https://github.com/koolsb/fpp-nfl/issues",
